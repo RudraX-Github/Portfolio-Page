@@ -17,7 +17,14 @@
         }
 
         html {
-             scroll-padding-top: 100px;
+             /* MODIFIED: Changed padding-top to 80px for a smaller mobile sticky nav */
+             scroll-padding-top: 80px;
+        }
+        /* ADDED: On medium screens and up, use the original 100px */
+        @media (min-width: 768px) {
+            html {
+                scroll-padding-top: 100px;
+            }
         }
 
         body {
@@ -411,13 +418,30 @@
 
     <header id="navbar" class="sticky top-0 z-50 w-full transition-all duration-300">
         <nav class="glass-card max-w-7xl mx-auto m-4 rounded-xl shadow-2xl">
-            <div class="card-content-wrapper"> <div class="flex items-center justify-between p-4 lg:px-8">
+            <div class="card-content-wrapper">
+                <div class="flex items-center justify-between p-4 lg:px-8">
                     <a href="#" class="text-xl font-bold gradient-text">Rudresh Chovatiya</a>
-                    <div class="flex items-center space-x-6">
+                    
+                    <div class="hidden md:flex items-center space-x-6">
                         <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300">About</a>
                         <a href="#skills" class="text-gray-300 hover:text-white transition-colors duration-300">Skills</a>
                         <a href="#experience" class="text-gray-300 hover:text-white transition-colors duration-300">Experience</a>
                         <a href="#projects" class="text-gray-300 hover:text-white transition-colors duration-300">Projects</a>
+                    </div>
+
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                            <i id="menu-icon" data-lucide="menu" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mobile-menu" class="hidden md:hidden">
+                    <div class="flex flex-col space-y-4 p-4 pt-0">
+                        <a href="#about" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">About</a>
+                        <a href="#skills" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Skills</a>
+                        <a href="#experience" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Experience</a>
+                        <a href="#projects" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Projects</a>
                     </div>
                 </div>
             </div>
@@ -426,21 +450,21 @@
 
     <main class="max-w-7xl mx-auto px-4 md:px-8">
 
-        <section id="about" class="min-h-[90vh] flex items-center justify-center text-center py-28 reveal">
+        <section id="about" class="min-h-[90vh] flex items-center justify-center text-center py-20 md:py-28 reveal">
             <div>
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 text-white" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 text-white" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
                     Data Science <span class="gradient-text">Portfolio</span>
                 </h1>
-                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-6 leading-relaxed">
+                <p class="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-6 leading-relaxed">
                     Curious by nature and analytical by training, my journey spans managing teams, supporting customers, and streamlining processes. Each role has sharpened my problem-solving, communication, and pattern-recognition skills.
                 </p>
-                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+                <p class="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
                     Now, I channel that experience into decoding data with Python, SQL, and Power BI. Whether forecasting trends or building models, I thrive on turning complexity into clarity and making data work smarter for real-world impact.
                 </p>
                 <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="mx-auto my-10 text-purple-400 opacity-50">
                     <path d="M0 10 Q 20 0, 40 10 T 80 10" stroke="currentColor" stroke-width="2" fill="transparent"/>
                 </svg>
-                <p class="text-3xl font-semibold gradient-text-alt italic tracking-wide mb-12">
+                <p class="text-2xl md:text-3xl font-semibold gradient-text-alt italic tracking-wide mb-12">
                     "Adept, Improvise, Overcome..."
                 </p>
                 <a href="#projects" class="pulse-button inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
@@ -451,17 +475,15 @@
 
         <hr class="section-divider reveal"/>
 
-        <section id="skills" class="py-28">
-             <div class="text-center mb-20 reveal">
-                <h2 class="text-4xl md:text-5xl font-bold text-white">Technical Toolkit</h2>
+        <section id="skills" class="py-20 md:py-28">
+             <div class="text-center mb-16 md:mb-20 reveal"> <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Technical Toolkit</h2>
              </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
 
-                <div class="glass-card glass-card-hover rounded-2xl p-8 reveal delay-100">
+                <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-100">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
-                            <i data-lucide="database-zap" class="w-12 h-12 text-blue-400"></i>
-                            <h3 class="text-3xl font-bold text-white">Languages & Databases</h3>
+                            <i data-lucide="database-zap" class="w-10 h-10 md:w-12 md:h-12 text-blue-400"></i> <h3 class="text-2xl md:text-3xl font-bold text-white">Languages & Databases</h3>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <span class="skill-tag text-gray-300">Python</span>
@@ -472,11 +494,11 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl p-8 reveal delay-200">
+                <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-200">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
-                            <i data-lucide="pie-chart" class="w-12 h-12 text-green-400"></i>
-                            <h3 class="text-3xl font-bold text-white">Analysis & Visualization</h3>
+                            <i data-lucide="pie-chart" class="w-10 h-10 md:w-12 md:h-12 text-green-400"></i>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white">Analysis & Visualization</h3>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <span class="skill-tag text-gray-300">Power BI</span>
@@ -489,11 +511,11 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl p-8 reveal delay-300">
+                <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-300">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
-                            <i data-lucide="brain" class="w-12 h-12 text-purple-400"></i>
-                            <h3 class="text-3xl font-bold text-white">Machine & Deep Learning</h3>
+                            <i data-lucide="brain" class="w-10 h-10 md:w-12 md:h-12 text-purple-400"></i>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white">Machine & Deep Learning</h3>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <span class="skill-tag text-gray-300">Scikit-learn</span>
@@ -508,11 +530,11 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl p-8 reveal delay-400">
+                <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-400">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
-                            <i data-lucide="users" class="w-12 h-12 text-pink-400"></i>
-                            <h3 class="text-3xl font-bold text-white">Professional Skills</h3>
+                            <i data-lucide="users" class="w-10 h-10 md:w-12 md:h-12 text-pink-400"></i>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white">Professional Skills</h3>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <span class="skill-tag text-gray-300">Analytical Thinking</span>
@@ -530,22 +552,20 @@
 
         <hr class="section-divider reveal"/>
 
-        <section id="experience" class="py-28">
-             <div class="text-center mb-20 reveal">
-                 <h2 class="text-4xl md:text-5xl font-bold text-white">Work Experience</h2>
+        <section id="experience" class="py-20 md:py-28"> <div class="text-center mb-16 md:mb-20 reveal"> <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Work Experience</h2>
              </div>
             <div class="relative max-w-4xl mx-auto">
                 <div class="timeline-line"></div>
 
                 <div class="timeline-item reveal delay-100">
                     <div class="timeline-dot"></div>
-                    <div class="glass-card timeline-card rounded-2xl p-8 shadow-lg">
-                        <div class="flex justify-between items-start mb-2">
+                    <div class="glass-card timeline-card rounded-2xl p-6 md:p-8 shadow-lg">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                             <div>
-                                <h3 class="text-2xl font-bold text-white"><i data-lucide="briefcase" class="inline-block w-6 h-6 mr-2 text-purple-300"></i>Senior Customer Support Rep.</h3>
-                                <p class="text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-white"><i data-lucide="briefcase" class="inline-block w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-300"></i>Senior Customer Support Rep.</h3>
+                                <p class="text-base md:text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
                             </div>
-                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full ml-4 mt-1">2023 - Present</span>
+                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full sm:ml-4 mt-2 sm:mt-1">2023 - Present</span>
                         </div>
                         <ul class="list-disc list-inside text-gray-300 space-y-2 mt-4 pl-1">
                             <li>Mentored junior team members and collaborated cross-functionally, fostering data-informed decision-making.</li>
@@ -555,13 +575,13 @@
                 </div>
                 <div class="timeline-item reveal delay-200">
                     <div class="timeline-dot"></div>
-                     <div class="glass-card timeline-card rounded-2xl p-8 shadow-lg">
-                        <div class="flex justify-between items-start mb-2">
+                     <div class="glass-card timeline-card rounded-2xl p-6 md:p-8 shadow-lg">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                             <div>
-                                <h3 class="text-2xl font-bold text-white"><i data-lucide="user-check" class="inline-block w-6 h-6 mr-2 text-purple-300"></i>Customer Support Rep.</h3>
-                                <p class="text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-white"><i data-lucide="user-check" class="inline-block w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-300"></i>Customer Support Rep.</h3>
+                                <p class="text-base md:text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
                             </div>
-                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full ml-4 mt-1">2022 - 2023</span>
+                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full sm:ml-4 mt-2 sm:mt-1">2022 - 2023</span>
                         </div>
                         <ul class="list-disc list-inside text-gray-300 space-y-2 mt-4 pl-1">
                             <li>Engaged with diverse customer queries, applying structured problem-solving and clear communication - skills vital for data interpretation and presentation.</li>
@@ -570,13 +590,13 @@
                 </div>
                 <div class="timeline-item reveal delay-300">
                     <div class="timeline-dot"></div>
-                     <div class="glass-card timeline-card rounded-2xl p-8 shadow-lg">
-                        <div class="flex justify-between items-start mb-2">
+                     <div class="glass-card timeline-card rounded-2xl p-6 md:p-8 shadow-lg">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                             <div>
-                                <h3 class="text-2xl font-bold text-white"><i data-lucide="trending-up" class="inline-block w-6 h-6 mr-2 text-purple-300"></i>Senior Process Associate</h3>
-                                <p class="text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-white"><i data-lucide="trending-up" class="inline-block w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-300"></i>Senior Process Associate</h3>
+                                <p class="text-base md:text-lg font-medium text-gray-400 mt-1">HI-TECH DIGITAL SOLUTIONS LLP</p>
                             </div>
-                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full ml-4 mt-1">2019 - 2022</span>
+                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full sm:ml-4 mt-2 sm:mt-1">2019 - 2022</span>
                         </div>
                         <ul class="list-disc list-inside text-gray-300 space-y-2 mt-4 pl-1">
                             <li>Interpreted diverse internal and external datasets to derive meaningful trends, correlations, and actionable business conclusions.</li>
@@ -585,13 +605,13 @@
                 </div>
                 <div class="timeline-item reveal delay-400">
                     <div class="timeline-dot"></div>
-                     <div class="glass-card timeline-card rounded-2xl p-8 shadow-lg">
-                        <div class="flex justify-between items-start mb-2">
+                     <div class="glass-card timeline-card rounded-2xl p-6 md:p-8 shadow-lg">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                             <div>
-                                <h3 class="text-2xl font-bold text-white"><i data-lucide="landmark" class="inline-block w-6 h-6 mr-2 text-purple-300"></i>Manager</h3>
-                                <p class="text-lg font-medium text-gray-400 mt-1">ARPAN EDUCATION HUB</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-white"><i data-lucide="landmark" class="inline-block w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-300"></i>Manager</h3>
+                                <p class="text-base md:text-lg font-medium text-gray-400 mt-1">ARPAN EDUCATION HUB</p>
                             </div>
-                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full ml-4 mt-1">2017 - 2019</span>
+                            <span class="flex-shrink-0 bg-purple-600/30 text-purple-200 text-sm font-semibold py-1 px-4 rounded-full sm:ml-4 mt-2 sm:mt-1">2017 - 2019</span>
                         </div>
                         <ul class="list-disc list-inside text-gray-300 space-y-2 mt-4 pl-1">
                             <li>Managed team workflows and resource allocation for data-driven projects, showcasing strong problem-solving and logical thinking.</li>
@@ -605,12 +625,10 @@
 
         <hr class="section-divider reveal"/>
 
-        <section id="projects" class="py-28">
-            <div class="text-center mb-20 reveal">
-                 <h2 class="text-4xl md:text-5xl font-bold text-white">Featured Projects</h2>
+        <section id="projects" class="py-20 md:py-28"> <div class="text-center mb-16 md:mb-20 reveal"> <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Featured Projects</h2>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
 
                 <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100">
                     <div class="card-content-wrapper">
@@ -660,7 +678,7 @@
                                     <span class="skill-tag text-gray-300">Scikit-learn</span>
                                     <span class="skill-tag text-gray-300">Pandas</span>
                                 </div>
-                                <a href="https://raw.githack.com/RudraX-Github/Strimlit/main/Movie%20Recommender%20System/Index_Movie.html" target="_blank" rel="noopener noreferrer" class="project-button inline-flex items-center gap-2 px-5 py-2 bg-indigo-600/80 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors duration-300">
+                                <a href="https://raw.githack.com/RudraX-Github/Strimlit/main/Movie%20Recommender%20System/Movie_Recommendation.html" target="_blank" rel="noopener noreferrer" class="project-button inline-flex items-center gap-2 px-5 py-2 bg-indigo-600/80 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors duration-300">
                                     View Project <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
                                 </a>
                             </div>
@@ -765,7 +783,7 @@
                                     <span class="skill-tag text-gray-300">Seaborn</span>
                                     <span class="skill-tag text-gray-300">YData Profiling</span>
                                 </div>
-                                <a href="httpsfs://raw.githack.com/RudraX-Github/Exploratory-data-analysis-EDA-/main/Traffice_data/Traffice_EDA_Info.html" target="_blank" rel="noopener noreferrer" class="project-button inline-flex items-center gap-2 px-5 py-2 bg-indigo-600/80 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors duration-300">
+                                <a href="https://raw.githack.com/RudraX-Github/Exploratory-data-analysis-EDA-/main/Traffice_data/Traffice_EDA_Info.html" target="_blank" rel="noopener noreferrer" class="project-button inline-flex items-center gap-2 px-5 py-2 bg-indigo-600/80 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors duration-300">
                                     View Project <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
                                 </a>
                             </div>
@@ -859,13 +877,42 @@
 
     </main>
 
-    <footer class="text-center py-20 mt-28 border-t border-white/10">
-        <p class="text-gray-400">&copy; 2025 Rudresh Chovatiya. All projects designed and built for training and educational purposes.</p>
-    </footer>
+    <footer class="text-center py-20 mt-20 md:mt-28 border-t border-white/10"> <p class="text-gray-400 px-4">&copy; 2025 Rudresh Chovatiya. All projects designed and built for training and educational purposes.</p> </footer>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
+            
+            // --- ADDED: Mobile Menu Toggle ---
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (menuButton) {
+                menuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    if (isHidden) {
+                        menuIcon.setAttribute('data-lucide', 'menu');
+                    } else {
+                        menuIcon.setAttribute('data-lucide', 'x');
+                    }
+                    lucide.createIcons(); // Re-render the new icon
+                });
+            }
+
+            // --- ADDED: Close mobile menu when a link is clicked ---
+            if (mobileMenu) {
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        menuIcon.setAttribute('data-lucide', 'menu');
+                        lucide.createIcons();
+                    });
+                });
+            }
+            // --- End of ADDED scripts ---
+
 
             const body = document.body;
             window.addEventListener('mousemove', (e) => {
