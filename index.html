@@ -427,6 +427,7 @@
                         <a href="#skills" class="text-gray-300 hover:text-white transition-colors duration-300">Skills</a>
                         <a href="#projects" class="text-gray-300 hover:text-white transition-colors duration-300">Projects</a>
                         <a href="#experience" class="text-gray-300 hover:text-white transition-colors duration-300">Experience</a>
+                        <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
                     </div>
 
                     <div class="md:hidden">
@@ -442,6 +443,7 @@
                         <a href="#skills" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Skills</a>
                         <a href="#projects" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Projects</a>
                         <a href="#experience" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Experience</a>
+                        <a href="#contact" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Contact</a>
                     </div>
                 </div>
             </div>
@@ -467,9 +469,26 @@
                 <p class="text-2xl md:text-3xl font-semibold gradient-text-alt italic tracking-wide mb-12">
                     "Adept, Improvise, Overcome..."
                 </p>
-                <a href="#projects" class="pulse-button inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-                    Explore My Projects
-                </a>
+                <div class="flex flex-col items-center gap-6">
+                    <a href="#projects" class="pulse-button inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+                        Explore My Projects
+                    </a>
+                    
+                    <div class="mt-8 flex flex-wrap justify-center gap-4">
+                        <a href="mailto:rudresh.chovatiya@gmail.com" class="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300">
+                            <i data-lucide="mail" class="w-4 h-4 text-gray-400 group-hover:text-red-400 transition-colors"></i>
+                            <span class="text-xs font-medium text-gray-400 group-hover:text-gray-200">Email</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/rudreshkumar-chovatiya" target="_blank" class="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300">
+                            <i data-lucide="linkedin" class="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors"></i>
+                            <span class="text-xs font-medium text-gray-400 group-hover:text-gray-200">LinkedIn</span>
+                        </a>
+                        <a href="https://wa.me/917016236850" target="_blank" class="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300">
+                            <i data-lucide="message-circle" class="w-4 h-4 text-gray-400 group-hover:text-green-400 transition-colors"></i>
+                            <span class="text-xs font-medium text-gray-400 group-hover:text-gray-200">WhatsApp</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -589,6 +608,33 @@
                 <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-200">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
+                            <i data-lucide="sprout" class="w-20 h-20 text-emerald-400"></i>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div>
+                                <span class="inline-block bg-emerald-600/20 text-emerald-300 py-1 px-3 rounded-full text-sm font-medium mb-3">Data Science & BI</span>
+                                <h3 class="text-2xl font-bold mb-3 text-white">AgriCast360</h3>
+                                <p class="text-gray-300 text-base mb-6">An agricultural intelligence platform analyzing 15K+ price records to visualize market trends, volatility, and weather correlations.</p>
+                            </div>
+                            <div class="mt-auto">
+                                <h4 class="font-semibold text-gray-200 mb-2">Tech Stack:</h4>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="skill-tag text-gray-300">Python</span>
+                                    <span class="skill-tag text-gray-300">Power BI</span>
+                                    <span class="skill-tag text-gray-300">MySQL</span>
+                                    <span class="skill-tag text-gray-300">APIs</span>
+                                </div>
+                                <a href="https://raw.githack.com/RudraX-Github/Visualization-Power-BI-/main/AgriCast360/AgriCast360.html" target="_blank" rel="noopener noreferrer" class="project-button inline-flex items-center gap-2 px-5 py-2 bg-indigo-600/80 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors duration-300">
+                                    View Project <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-300">
+                    <div class="card-content-wrapper">
+                        <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="film" class="w-20 h-20 text-blue-400"></i>
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
@@ -612,7 +658,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-300"> <div class="card-content-wrapper">
+
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100"> <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/10">
                             <i data-lucide="brain-circuit" class="w-20 h-20 text-pink-400"></i>
                         </div>
@@ -638,7 +685,7 @@
                        </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-400"> <div class="card-content-wrapper">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-200"> <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="car-front" class="w-20 h-20 text-yellow-400"></i>
                         </div>
@@ -664,7 +711,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-300">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="credit-card" class="w-20 h-20 text-indigo-300"></i>
@@ -691,7 +738,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-200">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="traffic-cone" class="w-20 h-20 text-green-400"></i>
@@ -718,7 +765,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-300">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-200">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="plane-takeoff" class="w-20 h-20 text-sky-400"></i>
@@ -745,7 +792,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-300">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="shopping-cart" class="w-20 h-20 text-teal-400"></i>
@@ -772,7 +819,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-200">
+                <div class="glass-card glass-card-hover rounded-2xl flex flex-col overflow-hidden reveal delay-100">
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20">
                             <i data-lucide="bug" class="w-20 h-20 text-red-400"></i>
@@ -872,6 +919,39 @@
                     </div>
                 </div>
 
+            </div>
+        </section>
+
+        <hr class="section-divider reveal"/>
+
+        <section id="contact" class="py-20 md:py-28">
+            <div class="text-center mb-16 md:mb-20 reveal">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Get In Touch</h2>
+            </div>
+            <div class="glass-card max-w-3xl mx-auto rounded-2xl p-8 md:p-12 reveal delay-100 text-center">
+                <p class="text-gray-300 text-lg mb-8">Whether you have a question, a project idea, or just want to say hi, I'd love to hear from you!</p>
+                <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-10">
+                    <a href="mailto:rudresh.chovatiya@gmail.com" class="group flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-all">
+                        <div class="p-4 bg-red-500/20 text-red-400 rounded-full group-hover:scale-110 transition-transform">
+                            <i data-lucide="mail" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-gray-300 group-hover:text-white transition-colors">rudresh.chovatiya@gmail.com</span>
+                    </a>
+                    
+                    <a href="https://www.linkedin.com/in/rudreshkumar-chovatiya" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-all">
+                        <div class="p-4 bg-blue-600/20 text-blue-400 rounded-full group-hover:scale-110 transition-transform">
+                            <i data-lucide="linkedin" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-gray-300 group-hover:text-white transition-colors">LinkedIn Profile</span>
+                    </a>
+
+                    <a href="https://wa.me/917016236850" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-all">
+                        <div class="p-4 bg-green-500/20 text-green-400 rounded-full group-hover:scale-110 transition-transform">
+                            <i data-lucide="message-circle" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-gray-300 group-hover:text-white transition-colors">+91 7016236850</span>
+                    </a>
+                </div>
             </div>
         </section>
 
