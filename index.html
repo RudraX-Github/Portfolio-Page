@@ -35,7 +35,7 @@
             position: relative;
         }
 
-        /* --- BACKGROUND EFFECTS (Kept intact) --- */
+        /* --- BACKGROUND EFFECTS --- */
         body::before {
             content: "";
             position: fixed;
@@ -210,88 +210,132 @@
         }
         .glass-card-hover:hover::after { transform: translateX(300%) skewX(-15deg); }
 
-        /* --- AI LAB SPECIFIC STYLES (NEW) --- */
-        .lab-font { font-family: 'JetBrains Mono', monospace; }
-        
-        .lab-card {
-            background: rgba(2, 6, 23, 0.7);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 243, 255, 0.2);
+        /* --- NEW AI LAB STYLES (Prismatic Glass) --- */
+        .prism-card {
+            background: rgba(10, 10, 26, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2rem;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s ease;
-            /* Cyberpunk cut corner shape */
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 92% 100%, 0 100%);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        .lab-card:hover {
-            border-color: var(--cyan-glow);
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .scanner-line {
+        /* The ambient colored light blob */
+        .prism-blob {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 5px;
-            background: var(--cyan-glow);
-            box-shadow: 0 0 15px var(--cyan-glow);
-            opacity: 0;
-            z-index: 10;
-            pointer-events: none;
+            width: 180px; height: 180px;
+            background: var(--blob-color, #4f46e5);
+            filter: blur(90px);
+            opacity: 0.35;
+            border-radius: 50%;
+            z-index: 0;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            top: -40px; right: -40px;
         }
         
-        .lab-card:hover .scanner-line {
-            opacity: 0.6;
-            animation: scan 2s linear infinite;
+        /* Secondary subtle blob at bottom left */
+        .prism-blob-2 {
+            position: absolute;
+            width: 120px; height: 120px;
+            background: var(--blob-color, #4f46e5);
+            filter: blur(80px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: 0;
+            bottom: -30px; left: -30px;
+            transition: all 0.7s ease;
         }
 
-        @keyframes scan {
-            0% { top: -10%; opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { top: 110%; opacity: 0; }
+        .prism-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4);
         }
 
-        .lab-grid-bg {
-            background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+        .prism-card:hover .prism-blob {
+            transform: scale(1.4) translate(-20px, 20px);
+            opacity: 0.5;
+        }
+        .prism-card:hover .prism-blob-2 {
+            opacity: 0.3;
+            transform: scale(1.2);
         }
 
-        .lab-btn {
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid var(--cyan-glow);
-            color: var(--cyan-glow);
-            font-family: 'JetBrains Mono', monospace;
+        .prism-content { position: relative; z-index: 1; }
+
+        .prism-icon-box {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .prism-card:hover .prism-icon-box {
+            transform: rotate(-8deg) scale(1.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .prism-tag {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8rem;
-            transition: all 0.3s;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .prism-btn {
+            margin-top: 1.5rem;
+            padding: 0.8rem 0;
+            width: 100%;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-        }
-        .lab-btn:hover {
-            background: var(--cyan-glow);
-            color: #000;
-            box-shadow: 0 0 20px var(--cyan-glow);
+            z-index: 2;
         }
         
-        .status-dot {
-            width: 8px; height: 8px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #ef4444;
-            display: inline-block;
-            margin-right: 6px;
+        .prism-btn::before {
+            content: '';
+            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+            z-index: -1;
         }
-        .lab-card:hover .status-dot {
-            background-color: #00f3ff;
-            box-shadow: 0 0 10px #00f3ff;
-            animation: pulse-dot 1s infinite;
+
+        .prism-btn:hover {
+            background: var(--blob-color);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        @keyframes pulse-dot { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .prism-btn:hover::before {
+            transform: translateX(100%);
+        }
 
 
         /* --- General Typography & Utils --- */
@@ -530,91 +574,120 @@
         <hr class="section-divider reveal"/>
 
         <section id="ailab" class="py-20 md:py-28 relative">
+            <!-- Background glow for section -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-900/10 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
+
             <div class="text-center mb-16 md:mb-20 reveal">
-                <span class="lab-font text-cyan-400 text-sm tracking-[0.2em] mb-2 block">INTERACTIVE SYSTEMS</span>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white font-sans">AI <span class="text-cyan-400">Laboratory</span></h2>
-                <p class="text-gray-400 mt-4 max-w-2xl mx-auto lab-font text-sm">Deploying live machine learning models. Status: Operational.</p>
+                <span class="text-sm font-bold tracking-[0.2em] text-cyan-300 uppercase opacity-80 mb-2 block">Interactive Systems</span>
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white">AI <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Laboratory</span></h2>
+                <p class="text-gray-400 mt-6 max-w-2xl mx-auto text-lg font-light">
+                    Experience real-time inference. Select a module to initialize the neural interface.
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 px-2">
                 
-                <div class="lab-card p-1 reveal delay-100 group">
-                    <div class="scanner-line"></div>
-                    <div class="lab-grid-bg"></div>
-                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
-                        <div class="flex justify-between items-start mb-4">
-                            <i data-lucide="car-front" class="w-10 h-10 text-cyan-400"></i>
-                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
-                                <span class="status-dot"></span>ONLINE
+                <!-- Card 1: Green Taxi -->
+                <div class="prism-card reveal delay-100" style="--blob-color: #0d9488;">
+                    <div class="prism-blob"></div>
+                    <div class="prism-blob-2"></div>
+                    
+                    <div class="prism-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="prism-icon-box">
+                                <i data-lucide="car-front" class="w-8 h-8 text-teal-300"></i>
                             </div>
+                            <span class="prism-tag">Predictive</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">Green Taxi AI</h3>
-                        <p class="text-gray-400 text-sm mb-6 font-light">Predictive modeling engine for NYC taxi fares. Input parameters to generate real-time fare estimates.</p>
-                        <div class="mt-auto">
-                            <a href="https://appgeentexi-knxvdxa73fejth6yqevnxv.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
-                                <i data-lucide="terminal" class="w-4 h-4 inline-block mr-2 align-middle"></i> INITIALIZE APP
-                            </a>
-                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-white mb-3">Green Taxi Estimator</h3>
+                        <p class="text-gray-300/90 text-sm leading-relaxed mb-6 font-light">
+                            Advanced regression engine for NYC transit. Inputs geospatial data to predict fare estimates with high precision using Random Forest ensembles.
+                        </p>
+                    </div>
+
+                    <div class="mt-auto relative z-10">
+                        <a href="https://appgeentexi-knxvdxa73fejth6yqevnxv.streamlit.app/" target="_blank" class="prism-btn">
+                            <i data-lucide="zap" class="w-4 h-4"></i> Initialize System
+                        </a>
                     </div>
                 </div>
 
-                <div class="lab-card p-1 reveal delay-200 group">
-                    <div class="scanner-line"></div>
-                    <div class="lab-grid-bg"></div>
-                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
-                        <div class="flex justify-between items-start mb-4">
-                            <i data-lucide="film" class="w-10 h-10 text-cyan-400"></i>
-                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
-                                <span class="status-dot"></span>ONLINE
+                <!-- Card 2: CineMatch -->
+                <div class="prism-card reveal delay-200" style="--blob-color: #7c3aed;">
+                    <div class="prism-blob"></div>
+                    <div class="prism-blob-2"></div>
+                    
+                    <div class="prism-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="prism-icon-box">
+                                <i data-lucide="film" class="w-8 h-8 text-violet-300"></i>
                             </div>
+                            <span class="prism-tag">Filtering</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">CineMatch System</h3>
-                        <p class="text-gray-400 text-sm mb-6 font-light">Content-based filtering algorithm. Analyzes metadata to generate personalized entertainment vectors.</p>
-                        <div class="mt-auto">
-                            <a href="https://appmovierecommendersystem-hjvbxvxhx3ywwljbqy9bof.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
-                                <i data-lucide="play-circle" class="w-4 h-4 inline-block mr-2 align-middle"></i> LAUNCH SYSTEM
-                            </a>
-                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-white mb-3">CineMatch Engine</h3>
+                        <p class="text-gray-300/90 text-sm leading-relaxed mb-6 font-light">
+                            Content-based filtering system. Utilizes cosine similarity and metadata vectorization to generate personalized entertainment recommendations.
+                        </p>
+                    </div>
+
+                    <div class="mt-auto relative z-10">
+                        <a href="https://appmovierecommendersystem-hjvbxvxhx3ywwljbqy9bof.streamlit.app/" target="_blank" class="prism-btn">
+                            <i data-lucide="play" class="w-4 h-4"></i> Launch Interface
+                        </a>
                     </div>
                 </div>
 
-                <div class="lab-card p-1 reveal delay-300 group">
-                    <div class="scanner-line"></div>
-                    <div class="lab-grid-bg"></div>
-                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
-                        <div class="flex justify-between items-start mb-4">
-                            <i data-lucide="message-square-text" class="w-10 h-10 text-cyan-400"></i>
-                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
-                                <span class="status-dot"></span>ONLINE
+                <!-- Card 3: NLP Text -->
+                <div class="prism-card reveal delay-300" style="--blob-color: #db2777;">
+                    <div class="prism-blob"></div>
+                    <div class="prism-blob-2"></div>
+                    
+                    <div class="prism-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="prism-icon-box">
+                                <i data-lucide="message-square-text" class="w-8 h-8 text-pink-300"></i>
                             </div>
+                            <span class="prism-tag">Linguistic</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">NLP Suite: Text</h3>
-                        <p class="text-gray-400 text-sm mb-6 font-light">Advanced linguistic processor. Features sentiment analysis, text generation, and summarization modules.</p>
-                        <div class="mt-auto">
-                            <a href="https://appnlpsuittext-hyr5gicoe69kxhfzzpkqe4.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
-                                <i data-lucide="code-2" class="w-4 h-4 inline-block mr-2 align-middle"></i> EXECUTE MODULE
-                            </a>
-                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-white mb-3">NLP Suite: Text</h3>
+                        <p class="text-gray-300/90 text-sm leading-relaxed mb-6 font-light">
+                            Comprehensive linguistic processor. Features sentiment analysis, automated summarization, and generative text capabilities powered by transformers.
+                        </p>
+                    </div>
+
+                    <div class="mt-auto relative z-10">
+                        <a href="https://appnlpsuittext-hyr5gicoe69kxhfzzpkqe4.streamlit.app/" target="_blank" class="prism-btn">
+                            <i data-lucide="terminal" class="w-4 h-4"></i> Execute Module
+                        </a>
                     </div>
                 </div>
 
-                <div class="lab-card p-1 reveal delay-400 group">
-                    <div class="scanner-line"></div>
-                    <div class="lab-grid-bg"></div>
-                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
-                        <div class="flex justify-between items-start mb-4">
-                            <i data-lucide="mic-activity" class="w-10 h-10 text-cyan-400"></i>
-                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
-                                <span class="status-dot"></span>ONLINE
+                <!-- Card 4: NLP Voice -->
+                <div class="prism-card reveal delay-400" style="--blob-color: #d97706;">
+                    <div class="prism-blob"></div>
+                    <div class="prism-blob-2"></div>
+                    
+                    <div class="prism-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="prism-icon-box">
+                                <i data-lucide="mic-activity" class="w-8 h-8 text-amber-300"></i>
                             </div>
+                            <span class="prism-tag">Acoustic</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">NLP Suite: Voice</h3>
-                        <p class="text-gray-400 text-sm mb-6 font-light">Audio signal processing unit. Capabilities: Speech-to-text transcription and acoustic analysis.</p>
-                        <div class="mt-auto">
-                            <a href="https://appnlpvoice-ehhxjasrygpnasfo9ese36.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
-                                <i data-lucide="waves" class="w-4 h-4 inline-block mr-2 align-middle"></i> ACTIVATE AUDIO
-                            </a>
-                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-white mb-3">NLP Suite: Voice</h3>
+                        <p class="text-gray-300/90 text-sm leading-relaxed mb-6 font-light">
+                            Real-time audio signal processing unit. Capable of speech-to-text transcription, acoustic analysis, and voice feature extraction.
+                        </p>
+                    </div>
+
+                    <div class="mt-auto relative z-10">
+                        <a href="https://appnlpvoice-ehhxjasrygpnasfo9ese36.streamlit.app/" target="_blank" class="prism-btn">
+                            <i data-lucide="mic" class="w-4 h-4"></i> Activate Audio
+                        </a>
                     </div>
                 </div>
 
