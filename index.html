@@ -7,20 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
     <style>
         :root {
             --mouse-x: 50%;
             --mouse-y: 50%;
+            --cyan-glow: #00f3ff;
+            --lab-bg: rgba(2, 6, 23, 0.8);
         }
 
         html {
-             /* MODIFIED: Changed padding-top to 80px for a smaller mobile sticky nav */
              scroll-padding-top: 80px;
         }
-        /* ADDED: On medium screens and up, use the original 100px */
         @media (min-width: 768px) {
             html {
                 scroll-padding-top: 100px;
@@ -35,7 +35,7 @@
             position: relative;
         }
 
-        /* 1. 3-Tone Background Gradient (Kept) */
+        /* --- BACKGROUND EFFECTS (Kept intact) --- */
         body::before {
             content: "";
             position: fixed;
@@ -43,11 +43,10 @@
             background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
             background-size: 400% 400%;
             animation: gradientBG 25s ease infinite;
-            z-index: -3; /* Pushed back to be the furthest layer */
+            z-index: -3;
             opacity: 0.9;
         }
 
-        /* Mouse-following light (Kept) */
         body::after {
             content: "";
             position: fixed;
@@ -68,12 +67,11 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 2. "Illusion" Orb Animation (Adjusted slightly) */
+        /* Orb Animations */
         @keyframes moveOrb1 {
             0% { transform: translate(0, 0) rotate(0deg); }
             100% { transform: translate(35vw, 25vh) rotate(200deg); }
         }
-
         @keyframes moveOrb2 {
             0% { transform: translate(0, 0) rotate(0deg); }
             100% { transform: translate(-30vw, -35vh) rotate(-220deg); }
@@ -81,49 +79,42 @@
 
         .animation-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             z-index: -2;
             overflow: hidden;
             pointer-events: none;
         }
-
-        .animation-layer::before,
-        .animation-layer::after {
+        .animation-layer::before, .animation-layer::after {
             content: '';
             position: absolute;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(167, 139, 250, 0.4), transparent 60%);
-            filter: blur(80px); /* Slightly reduced blur for orbs */
-            opacity: 0.4; /* Slightly reduced opacity */
+            filter: blur(80px);
+            opacity: 0.4;
         }
-
         .animation-layer::before {
             width: 60vmax;
             height: 60vmax;
             top: -20%;
             left: -10%;
-            animation: moveOrb1 22s infinite alternate ease-in-out; /* Adjusted duration */
+            animation: moveOrb1 22s infinite alternate ease-in-out;
         }
-
         .animation-layer::after {
             width: 50vmax;
             height: 50vmax;
             bottom: -15%;
             right: -15%;
             background: radial-gradient(circle, rgba(244, 114, 182, 0.3), transparent 60%);
-            animation: moveOrb2 28s infinite alternate-reverse ease-in-out; /* Adjusted duration */
+            animation: moveOrb2 28s infinite alternate-reverse ease-in-out;
         }
 
-        /* 3. "Starfield" Illusion (Kept) */
+        /* Starfield */
         #starfield {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: -2;
             pointer-events: none;
-            overflow: hidden; /* Ensure stars don't overflow */
+            overflow: hidden;
         }
         .star {
             position: absolute;
@@ -136,161 +127,200 @@
             0% { opacity: 0.2; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1); }
         }
-        /* --- End Starfield --- */
 
-        /* 4. Hex Grid (NEW!) */
+        /* Hex Grid */
         .hex-grid-layer {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: -2;
             pointer-events: none;
             overflow: hidden;
-            opacity: 0.03; /* Very faint */
+            opacity: 0.03;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23fff" d="M25 0 L75 0 L100 50 L75 100 L25 100 L0 50 Z" opacity="0.05"/></svg>');
-            background-size: 150px 150px; /* Adjust size of hexes */
-            animation: panHexGrid 120s linear infinite; /* Slow pan animation */
+            background-size: 150px 150px;
+            animation: panHexGrid 120s linear infinite;
         }
-
         @keyframes panHexGrid {
             0% { background-position: 0 0; }
-            100% { background-position: 150px 150px; } /* Move by one hex width/height */
+            100% { background-position: 150px 150px; }
         }
 
-        /* 5. Floating Particles (NEW!) */
-        .particle-layer {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1; /* Higher than other effects, lower than content */
-            pointer-events: none;
-            overflow: hidden;
-        }
+        /* Particles & Canvas */
+        .particle-layer { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; overflow: hidden; }
         .particle {
             position: absolute;
             background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%);
             border-radius: 50%;
             opacity: 0;
             animation: floatAndFade 20s infinite ease-in-out;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
-
         @keyframes floatAndFade {
             0% { transform: translate(var(--x-start), var(--y-start)) scale(0.2); opacity: 0; }
             20% { opacity: 0.5; transform: translate(var(--x-mid), var(--y-mid)) scale(1); }
             80% { opacity: 0.5; transform: translate(var(--x-end), var(--y-end)) scale(0.5); }
             100% { opacity: 0; transform: translate(var(--x-end), var(--y-end)) scale(0.2); }
         }
-
-        /* 6. Connecting Lines (NEW! - Canvas based for performance) */
-        #connecting-lines-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Same as particles, ensures they draw over stars */
-            pointer-events: none;
-            opacity: 0.1; /* Very subtle */
+        #connecting-lines-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.1; }
+        .ripple-layer { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -0; pointer-events: none; overflow: hidden; filter: blur(0.5px); opacity: 0.05; }
+        .ripple {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.1), transparent 70%);
+            animation: rippleEffect 25s infinite ease-in-out;
+        }
+        @keyframes rippleEffect {
+            0% { transform: translate(var(--r-x-start), var(--r-y-start)) scale(0); opacity: 0; }
+            20% { opacity: 0.2; transform: translate(var(--r-x-mid), var(--r-y-mid)) scale(1); }
+            80% { opacity: 0; transform: translate(var(--r-x-end), var(--r-y-end)) scale(1.5); }
+            100% { opacity: 0; transform: translate(var(--r-x-end), var(--r-y-end)) scale(0); }
         }
 
 
-        /* --- "CRYSTAL ICE" CARD STYLES (Truly Transparent) --- */
+        /* --- STANDARD GLASS CARD STYLES --- */
         .glass-card {
-            background: transparent; /* NO BACKGROUND COLOR */
-            backdrop-filter: blur(5px); /* REDUCED BLUR */
-            -webkit-backdrop-filter: blur(5px); /* REDUCED BLUR */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            background: transparent;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             border-radius: 1rem;
             position: relative;
             overflow: hidden;
             perspective: 1000px;
-            transform-style: preserve-3d; /* Enhanced 3D */
+            transform-style: preserve-3d;
         }
-
          .glass-card-hover::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(circle 350px at 50% 120%, rgba(167, 139, 250, 0.25), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease-out;
-            z-index: 0;
+            opacity: 0; transition: opacity 0.4s ease-out; z-index: 0;
          }
-         .glass-card-hover:hover::before {
-            opacity: 1;
-         }
-         .card-content-wrapper {
-            position: relative;
-            z-index: 1;
-            transform: translateZ(30px); /* Enhanced 3D - content floats */
-         }
-
+         .glass-card-hover:hover::before { opacity: 1; }
+         .card-content-wrapper { position: relative; z-index: 1; transform: translateZ(30px); }
         .glass-card-hover:hover {
-            background: rgba(255, 255, 255, 0.03); /* Very subtle white tint on hover */
+            background: rgba(255, 255, 255, 0.03);
             transform: translateY(-10px) scale(1.03) rotateX(2deg) rotateY(-1deg);
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-            border-color: rgba(255, 255, 255, 0.2); /* Brighter border on hover */
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .glass-card-hover::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-200%) skewX(-15deg);
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1); z-index: 2; filter: blur(3px); pointer-events: none;
+        }
+        .glass-card-hover:hover::after { transform: translateX(300%) skewX(-15deg); }
+
+        /* --- AI LAB SPECIFIC STYLES (NEW) --- */
+        .lab-font { font-family: 'JetBrains Mono', monospace; }
+        
+        .lab-card {
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            /* Cyberpunk cut corner shape */
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 92% 100%, 0 100%);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.05);
         }
 
-        /* "Shine" Animation (Kept) - modified for transparent glass */
-        .glass-card-hover::after {
-            content: '';
+        .lab-card:hover {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .scanner-line {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%); /* Subtler shine */
-            transform: translateX(-200%) skewX(-15deg);
-            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 2;
-            filter: blur(3px); /* Reduced blur */
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--cyan-glow);
+            box-shadow: 0 0 15px var(--cyan-glow);
+            opacity: 0;
+            z-index: 10;
             pointer-events: none;
         }
-        .glass-card-hover:hover::after {
-            transform: translateX(300%) skewX(-15deg);
+        
+        .lab-card:hover .scanner-line {
+            opacity: 0.6;
+            animation: scan 2s linear infinite;
         }
-        /* --- End of Shine --- */
+
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        .lab-grid-bg {
+            background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+        }
+
+        .lab-btn {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--cyan-glow);
+            color: var(--cyan-glow);
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .lab-btn:hover {
+            background: var(--cyan-glow);
+            color: #000;
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+        
+        .status-dot {
+            width: 8px; height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ef4444;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .lab-card:hover .status-dot {
+            background-color: #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+            animation: pulse-dot 1s infinite;
+        }
+        @keyframes pulse-dot { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
 
+        /* --- General Typography & Utils --- */
         .gradient-text {
             background: linear-gradient(90deg, #a78bfa, #f472b6, #fda4af, #a78bfa);
             background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent;
             animation: gradient-shimmer 4s linear infinite;
         }
         .gradient-text-alt {
             background: linear-gradient(90deg, #818cf8, #c084fc, #818cf8);
             background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent;
             animation: gradient-shimmer 5s linear infinite reverse;
         }
-
         @keyframes gradient-shimmer {
             0% { background-position: 200% center; }
             100% { background-position: 0% center; }
         }
 
         .reveal {
-            opacity: 0;
-            transform: translateY(40px) scale(0.98);
+            opacity: 0; transform: translateY(40px) scale(0.98);
             transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        .reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
         .delay-100 { transition-delay: 100ms !important; }
         .delay-200 { transition-delay: 200ms !important; }
         .delay-300 { transition-delay: 300ms !important; }
         .delay-400 { transition-delay: 400ms !important; }
-        .delay-500 { transition-delay: 500ms !important; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1a1a2e; }
@@ -306,113 +336,44 @@
         .timeline-card:hover { transform: scale(1.03); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); }
 
         .skill-tag {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            display: inline-block;
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; display: inline-block;
         }
         .skill-tag:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.2); transform: scale(1.05); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        h2 {
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.75rem;
-            color: #fff;
-            margin-bottom: 1rem;
-        }
+        h2 { position: relative; display: inline-block; padding-bottom: 0.75rem; color: #fff; margin-bottom: 1rem; }
         h2::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            bottom: 0;
-            transform: translateX(-50%) scaleX(1);
-            width: 70px;
-            height: 3px;
-            background: linear-gradient(90deg, #a78bfa, #f472b6);
-            border-radius: 2px;
+            content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%) scaleX(1);
+            width: 70px; height: 3px; background: linear-gradient(90deg, #a78bfa, #f472b6); border-radius: 2px;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .text-center:hover h2::after {
-            transform: translateX(-50%) scaleX(1.4);
-        }
+        .text-center:hover h2::after { transform: translateX(-50%) scaleX(1.4); }
 
-        .timeline-item h3 { display: flex; align-items: center; gap: 0.75rem; }
-         .timeline-item h3 i { flex-shrink: 0; }
-
-        .pulse-button {
-            animation: pulse-animation 2.5s infinite ease-in-out;
-        }
+        .pulse-button { animation: pulse-animation 2.5s infinite ease-in-out; }
         @keyframes pulse-animation {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.6); }
             70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(167, 139, 250, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
         }
 
-        .section-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-            margin: 5rem 0;
-        }
-
-        /* Navbar-scrolled - reduced blur */
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent); margin: 5rem 0; }
+        
         .navbar-scrolled {
-            background: rgba(30, 30, 45, 0.85);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-bottom-color: rgba(255, 255, 255, 0.15);
+            background: rgba(30, 30, 45, 0.85); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-bottom-color: rgba(255, 255, 255, 0.15);
         }
-
-        .project-button:hover {
-            box-shadow: 0 0 20px rgba(130, 140, 248, 0.5);
-        }
-
-        /* 7. Subtle Wave/Ripple Effect (NEW!) */
-        .ripple-layer {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -0; /* Highest background layer, lowest content */
-            pointer-events: none;
-            overflow: hidden;
-            filter: blur(0.5px); /* Very subtle blur */
-            opacity: 0.05; /* Very subtle */
-        }
-        .ripple {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(167, 139, 250, 0.1), transparent 70%);
-            animation: rippleEffect 25s infinite ease-in-out;
-        }
-        @keyframes rippleEffect {
-            0% { transform: translate(var(--r-x-start), var(--r-y-start)) scale(0); opacity: 0; }
-            20% { opacity: 0.2; transform: translate(var(--r-x-mid), var(--r-y-mid)) scale(1); }
-            80% { opacity: 0; transform: translate(var(--r-x-end), var(--r-y-end)) scale(1.5); }
-            100% { opacity: 0; transform: translate(var(--r-x-end), var(--r-y-end)) scale(0); }
-        }
+        .project-button:hover { box-shadow: 0 0 20px rgba(130, 140, 248, 0.5); }
 
     </style>
 </head>
 <body class="antialiased">
 
     <div class="hex-grid-layer"></div>
-
     <div class="animation-layer"></div>
-
     <div id="starfield"></div>
-
     <div class="particle-layer" id="particle-layer"></div>
-
     <canvas id="connecting-lines-canvas"></canvas>
-
     <div class="ripple-layer" id="ripple-layer"></div>
 
 
@@ -425,6 +386,7 @@
                     <div class="hidden md:flex items-center space-x-6">
                         <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300">About</a>
                         <a href="#skills" class="text-gray-300 hover:text-white transition-colors duration-300">Skills</a>
+                        <a href="#ailab" class="text-cyan-300 hover:text-cyan-100 transition-colors duration-300 font-medium">AI Lab</a>
                         <a href="#projects" class="text-gray-300 hover:text-white transition-colors duration-300">Projects</a>
                         <a href="#experience" class="text-gray-300 hover:text-white transition-colors duration-300">Experience</a>
                         <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
@@ -441,6 +403,7 @@
                     <div class="flex flex-col space-y-4 p-4 pt-0">
                         <a href="#about" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">About</a>
                         <a href="#skills" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Skills</a>
+                        <a href="#ailab" class="block text-cyan-400 hover:text-cyan-100 transition-colors duration-300 py-2">AI Lab</a>
                         <a href="#projects" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Projects</a>
                         <a href="#experience" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Experience</a>
                         <a href="#contact" class="block text-gray-300 hover:text-white transition-colors duration-300 py-2">Contact</a>
@@ -470,8 +433,8 @@
                     "Adept, Improvise, Overcome..."
                 </p>
                 <div class="flex flex-col items-center gap-6">
-                    <a href="#projects" class="pulse-button inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-                        Explore My Projects
+                    <a href="#ailab" class="pulse-button inline-block px-10 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold rounded-lg shadow-xl hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+                        Launch Live Demos
                     </a>
                     
                     <div class="mt-8 flex flex-wrap justify-center gap-4">
@@ -498,7 +461,6 @@
              <div class="text-center mb-16 md:mb-20 reveal"> <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Technical Toolkit</h2>
              </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-
                 <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-100">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
@@ -512,7 +474,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-200">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
@@ -529,7 +490,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-300">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
@@ -548,7 +508,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="glass-card glass-card-hover rounded-2xl p-6 md:p-8 reveal delay-400">
                     <div class="card-content-wrapper">
                         <div class="flex items-center gap-4 mb-6">
@@ -565,10 +524,102 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
+        <hr class="section-divider reveal"/>
+
+        <section id="ailab" class="py-20 md:py-28 relative">
+            <div class="text-center mb-16 md:mb-20 reveal">
+                <span class="lab-font text-cyan-400 text-sm tracking-[0.2em] mb-2 block">INTERACTIVE SYSTEMS</span>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white font-sans">AI <span class="text-cyan-400">Laboratory</span></h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto lab-font text-sm">Deploying live machine learning models. Status: Operational.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                
+                <div class="lab-card p-1 reveal delay-100 group">
+                    <div class="scanner-line"></div>
+                    <div class="lab-grid-bg"></div>
+                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
+                        <div class="flex justify-between items-start mb-4">
+                            <i data-lucide="car-front" class="w-10 h-10 text-cyan-400"></i>
+                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
+                                <span class="status-dot"></span>ONLINE
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">Green Taxi AI</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-light">Predictive modeling engine for NYC taxi fares. Input parameters to generate real-time fare estimates.</p>
+                        <div class="mt-auto">
+                            <a href="https://appgeentexi-knxvdxa73fejth6yqevnxv.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
+                                <i data-lucide="terminal" class="w-4 h-4 inline-block mr-2 align-middle"></i> INITIALIZE APP
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-card p-1 reveal delay-200 group">
+                    <div class="scanner-line"></div>
+                    <div class="lab-grid-bg"></div>
+                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
+                        <div class="flex justify-between items-start mb-4">
+                            <i data-lucide="film" class="w-10 h-10 text-cyan-400"></i>
+                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
+                                <span class="status-dot"></span>ONLINE
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">CineMatch System</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-light">Content-based filtering algorithm. Analyzes metadata to generate personalized entertainment vectors.</p>
+                        <div class="mt-auto">
+                            <a href="https://appmovierecommendersystem-hjvbxvxhx3ywwljbqy9bof.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
+                                <i data-lucide="play-circle" class="w-4 h-4 inline-block mr-2 align-middle"></i> LAUNCH SYSTEM
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-card p-1 reveal delay-300 group">
+                    <div class="scanner-line"></div>
+                    <div class="lab-grid-bg"></div>
+                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
+                        <div class="flex justify-between items-start mb-4">
+                            <i data-lucide="message-square-text" class="w-10 h-10 text-cyan-400"></i>
+                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
+                                <span class="status-dot"></span>ONLINE
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">NLP Suite: Text</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-light">Advanced linguistic processor. Features sentiment analysis, text generation, and summarization modules.</p>
+                        <div class="mt-auto">
+                            <a href="https://appnlpsuittext-hyr5gicoe69kxhfzzpkqe4.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
+                                <i data-lucide="code-2" class="w-4 h-4 inline-block mr-2 align-middle"></i> EXECUTE MODULE
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-card p-1 reveal delay-400 group">
+                    <div class="scanner-line"></div>
+                    <div class="lab-grid-bg"></div>
+                    <div class="relative z-10 p-6 flex flex-col h-full bg-opacity-90">
+                        <div class="flex justify-between items-start mb-4">
+                            <i data-lucide="mic-activity" class="w-10 h-10 text-cyan-400"></i>
+                            <div class="text-xs lab-font text-cyan-300 border border-cyan-900 px-2 py-1 rounded bg-black/50">
+                                <span class="status-dot"></span>ONLINE
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2 lab-font tracking-wide">NLP Suite: Voice</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-light">Audio signal processing unit. Capabilities: Speech-to-text transcription and acoustic analysis.</p>
+                        <div class="mt-auto">
+                            <a href="https://appnlpvoice-ehhxjasrygpnasfo9ese36.streamlit.app/" target="_blank" class="lab-btn w-full block text-center py-3">
+                                <i data-lucide="waves" class="w-4 h-4 inline-block mr-2 align-middle"></i> ACTIVATE AUDIO
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
         <hr class="section-divider reveal"/>
 
         <section id="projects" class="py-20 md:py-28"> <div class="text-center mb-16 md:mb-20 reveal"> <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Featured Projects</h2>
@@ -580,13 +631,12 @@
                     <div class="card-content-wrapper">
                         <div class="h-48 w-full flex items-center justify-center bg-black/20 relative">
                             <i data-lucide="mic-vocal" class="w-20 h-20 text-purple-400"></i>
-                            <span class="absolute top-4 right-4 bg-yellow-500/20 text-yellow-300 text-xs font-bold py-1 px-3 rounded-full uppercase tracking-wider">In Dev</span>
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
                             <div>
                                 <span class="inline-block bg-purple-600/20 text-purple-300 py-1 px-3 rounded-full text-sm font-medium mb-3">NLP & Speech Processing</span>
-                                <h3 class="text-2xl font-bold mb-3 text-white">Voice NLP Suite <span class="text-yellow-400 text-lg">(Upcoming)</span></h3>
-                                <p class="text-gray-300 text-base mb-6">Upcoming project to capture, transcribe, analyze (acoustic, linguistic, emotional), and synthesize voice with cloning & translation.</p>
+                                <h3 class="text-2xl font-bold mb-3 text-white">Voice NLP Suite</h3>
+                                <p class="text-gray-300 text-base mb-6">Project to capture, transcribe, analyze (acoustic, linguistic, emotional), and synthesize voice with cloning & translation.</p>
                             </div>
                             <div class="mt-auto">
                                 <h4 class="font-semibold text-gray-200 mb-2">Tech Stack:</h4>
@@ -963,25 +1013,18 @@
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
             
-            // --- ADDED: Mobile Menu Toggle ---
+            // Mobile Menu
             const menuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const menuIcon = document.getElementById('menu-icon');
-
             if (menuButton) {
                 menuButton.addEventListener('click', () => {
                     mobileMenu.classList.toggle('hidden');
                     const isHidden = mobileMenu.classList.contains('hidden');
-                    if (isHidden) {
-                        menuIcon.setAttribute('data-lucide', 'menu');
-                    } else {
-                        menuIcon.setAttribute('data-lucide', 'x');
-                    }
-                    lucide.createIcons(); // Re-render the new icon
+                    menuIcon.setAttribute('data-lucide', isHidden ? 'menu' : 'x');
+                    lucide.createIcons();
                 });
             }
-
-            // --- ADDED: Close mobile menu when a link is clicked ---
             if (mobileMenu) {
                 mobileMenu.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', () => {
@@ -991,9 +1034,8 @@
                     });
                 });
             }
-            // --- End of ADDED scripts ---
 
-
+            // Mouse tracking
             const body = document.body;
             window.addEventListener('mousemove', (e) => {
                 requestAnimationFrame(() => {
@@ -1004,6 +1046,7 @@
                 });
             });
 
+            // Reveal on Scroll
             const revealElements = document.querySelectorAll('.reveal');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -1011,32 +1054,25 @@
                         entry.target.classList.add('visible');
                     }
                 });
-            }, {
-                threshold: 0.05
-            });
+            }, { threshold: 0.05 });
+            revealElements.forEach(el => observer.observe(el));
 
-            revealElements.forEach(el => {
-                observer.observe(el);
-            });
-
+            // Navbar
             const navbar = document.getElementById('navbar');
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('navbar-scrolled');
-                } else {
-                    navbar.classList.remove('navbar-scrolled');
-                }
+                if (window.scrollY > 50) navbar.classList.add('navbar-scrolled');
+                else navbar.classList.remove('navbar-scrolled');
             }, { passive: true });
 
-            // Starfield Creation
+            // Starfield
             const starfield = document.getElementById('starfield');
-            const numStars = 150; // Keep the number of stars reasonable for performance
+            const numStars = 150;
             let stars = [];
             if (starfield) {
                 for (let i = 0; i < numStars; i++) {
                     const star = document.createElement('div');
                     star.classList.add('star');
-                    const size = Math.random() * 2 + 1; // 1px to 3px
+                    const size = Math.random() * 2 + 1;
                     star.style.width = `${size}px`;
                     star.style.height = `${size}px`;
                     star.style.top = `${Math.random() * 100}%`;
@@ -1044,125 +1080,83 @@
                     star.style.animationDelay = `${Math.random() * 5}s`;
                     star.style.animationDuration = `${Math.random() * 3 + 3}s`;
                     starfield.appendChild(star);
-                    stars.push(star); // Store stars for connecting lines
+                    stars.push(star);
                 }
             }
 
-            // Floating Particles Creation (NEW!)
+            // Particles
             const particleLayer = document.getElementById('particle-layer');
-            const numParticles = 40;
             if (particleLayer) {
-                for (let i = 0; i < numParticles; i++) {
+                for (let i = 0; i < 40; i++) {
                     const particle = document.createElement('div');
                     particle.classList.add('particle');
-                    const size = Math.random() * 10 + 5; // 5px to 15px
+                    const size = Math.random() * 10 + 5;
                     particle.style.width = `${size}px`;
                     particle.style.height = `${size}px`;
-
-                    // Random start, mid, end positions for animation
                     particle.style.setProperty('--x-start', `${Math.random() * window.innerWidth}px`);
                     particle.style.setProperty('--y-start', `${Math.random() * window.innerHeight}px`);
                     particle.style.setProperty('--x-mid', `${Math.random() * window.innerWidth}px`);
                     particle.style.setProperty('--y-mid', `${Math.random() * window.innerHeight}px`);
                     particle.style.setProperty('--x-end', `${Math.random() * window.innerWidth}px`);
                     particle.style.setProperty('--y-end', `${Math.random() * window.innerHeight}px`);
-
                     particle.style.animationDelay = `${Math.random() * 10}s`;
-                    particle.style.animationDuration = `${Math.random() * 15 + 15}s`; // 15s to 30s
+                    particle.style.animationDuration = `${Math.random() * 15 + 15}s`;
                     particleLayer.appendChild(particle);
                 }
             }
 
-            // Connecting Lines (NEW! - Canvas)
+            // Connecting Lines
             const canvas = document.getElementById('connecting-lines-canvas');
             const ctx = canvas.getContext('2d');
             let animationFrameId;
-
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
             function drawConnectingLines() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; // Very faint white lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
                 ctx.lineWidth = 0.5;
-
                 const allPoints = Array.from(stars).map(s => ({
-                    x: s.offsetLeft + s.offsetWidth / 2,
-                    y: s.offsetTop + s.offsetHeight / 2,
-                    opacity: parseFloat(getComputedStyle(s).opacity) // Get current opacity
+                    x: s.offsetLeft + s.offsetWidth / 2, y: s.offsetTop + s.offsetHeight / 2, opacity: parseFloat(getComputedStyle(s).opacity)
                 }));
-
-                const particleElements = document.querySelectorAll('.particle');
-                particleElements.forEach(p => {
+                document.querySelectorAll('.particle').forEach(p => {
                     const rect = p.getBoundingClientRect();
-                     // Only add if particle is visible and within bounds
                     if (rect.width > 0 && rect.height > 0 && rect.x < window.innerWidth && rect.y < window.innerHeight && rect.x + rect.width > 0 && rect.y + rect.height > 0) {
-                        allPoints.push({
-                            x: rect.x + rect.width / 2,
-                            y: rect.y + rect.height / 2,
-                            opacity: parseFloat(getComputedStyle(p).opacity)
-                        });
+                        allPoints.push({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2, opacity: parseFloat(getComputedStyle(p).opacity) });
                     }
                 });
-
-                const maxDistance = 120; // Max distance for lines to connect
-
+                const maxDistance = 120;
                 for (let i = 0; i < allPoints.length; i++) {
                     for (let j = i + 1; j < allPoints.length; j++) {
-                        const p1 = allPoints[i];
-                        const p2 = allPoints[j];
+                        const p1 = allPoints[i]; const p2 = allPoints[j];
                         const dist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-
                         if (dist < maxDistance) {
-                            const alpha = (1 - (dist / maxDistance)) * Math.min(p1.opacity, p2.opacity); // Fade based on distance and point opacity
-                            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.4})`; // Adjust overall opacity
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
+                            const alpha = (1 - (dist / maxDistance)) * Math.min(p1.opacity, p2.opacity);
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.4})`;
+                            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
                         }
                     }
                 }
                 animationFrameId = requestAnimationFrame(drawConnectingLines);
             }
+            window.addEventListener('resize', () => { resizeCanvas(); if(animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = requestAnimationFrame(drawConnectingLines); });
+            if (canvas) { resizeCanvas(); drawConnectingLines(); }
 
-            window.addEventListener('resize', () => {
-                resizeCanvas();
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
-                animationFrameId = requestAnimationFrame(drawConnectingLines);
-            });
-
-            if (canvas) {
-                resizeCanvas();
-                drawConnectingLines();
-            }
-
-            // Subtle Ripple Effect (NEW!)
+            // Ripples
             const rippleLayer = document.getElementById('ripple-layer');
-            const numRipples = 5;
             if (rippleLayer) {
-                for (let i = 0; i < numRipples; i++) {
+                for (let i = 0; i < 5; i++) {
                     const ripple = document.createElement('div');
                     ripple.classList.add('ripple');
-
-                    // Random start, mid, end positions for animation
                     ripple.style.setProperty('--r-x-start', `${Math.random() * 100}vw`);
                     ripple.style.setProperty('--r-y-start', `${Math.random() * 100}vh`);
                     ripple.style.setProperty('--r-x-mid', `${Math.random() * 100}vw`);
                     ripple.style.setProperty('--r-y-mid', `${Math.random() * 100}vh`);
                     ripple.style.setProperty('--r-x-end', `${Math.random() * 100}vw`);
                     ripple.style.setProperty('--r-y-end', `${Math.random() * 100}vh`);
-
                     ripple.style.animationDelay = `${Math.random() * 20}s`;
-                    ripple.style.animationDuration = `${Math.random() * 20 + 20}s`; // 20s to 40s
+                    ripple.style.animationDuration = `${Math.random() * 20 + 20}s`;
                     rippleLayer.appendChild(ripple);
                 }
             }
-
         });
     </script>
 
