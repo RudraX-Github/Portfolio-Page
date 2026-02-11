@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Projects Command Center | Rudresh Chovatiya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .phase-gradient {
+            border-left: 4px solid #3b82f6;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+        }
+
+        .tab-active { 
+            background: linear-gradient(to right, #2563eb, #7c3aed); 
+            color: white; 
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; opacity: 0; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-block b { color: #60a5fa; font-weight: 700; display: block; margin-top: 12px; margin-bottom: 4px; }
+        .content-block b:first-child { margin-top: 0; }
+        .content-block p { margin-bottom: 8px; color: #94a3b8; }
+
+        #profileModal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #profileModal.hidden { opacity: 0; visibility: hidden; display: none; }
+        #profileModal.flex { opacity: 1; visibility: visible; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-20 border-b border-slate-800 bg-slate-950/90 flex items-center justify-between px-8 z-30">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i data-lucide="command" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold text-white tracking-tight">Portfolio <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-300">Command Center</span></h1>
+                <p class="text-[10px] text-slate-500 font-mono uppercase tracking-[0.2em]">Lead Architect Verified Strategy</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="hidden lg:flex gap-6 text-[11px] font-bold uppercase tracking-wider">
+                <div class="flex items-center gap-1.5 text-blue-400"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> 3 Posts / Week</div>
+                <div class="flex items-center gap-1.5 text-indigo-400"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Full O-E-I Logic</div>
+            </div>
+            <div class="h-8 w-px bg-slate-800"></div>
+            
+            <button onclick="openModal()" class="flex items-center gap-3 group">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">Rudresh Chovatiya</p>
+                    <p class="text-[9px] text-slate-500 font-mono">Principal Architect</p>
+                </div>
+                <div class="w-10 h-10 rounded-full border-2 border-blue-500/30 overflow-hidden group-hover:border-blue-500 transition-all shadow-lg shadow-blue-500/10">
+                    <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop" alt="Profile" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Navigation -->
+        <aside class="w-72 bg-slate-950 border-r border-slate-800 flex flex-col z-20">
+            <div class="p-6 overflow-y-auto flex-1 custom-scroll">
+                <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Phase Rollout</h2>
+                <div class="space-y-2" id="phaseTabs"></div>
+            </div>
+            
+            <div class="p-6 border-t border-slate-900 bg-slate-900/20">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">System Integrity</span>
+                    <span class="text-xs font-mono text-blue-400">Stable</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="mainProgress" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Display -->
+        <main class="flex-1 overflow-auto bg-[#020617] relative">
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none"></div>
+            
+            <div class="max-w-7xl mx-auto p-10 relative z-10">
+                <div class="mb-12">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
+                        <i data-lucide="shield-check" class="w-3 h-3"></i> <span id="currentPhaseLabel">Phase</span>
+                    </div>
+                    <h2 class="text-4xl font-black text-white mb-3" id="phaseTitle">...</h2>
+                    <p class="text-slate-400 text-lg max-w-3xl leading-relaxed" id="phaseDesc">...</p>
+                </div>
+
+                <div id="projectGrid" class="space-y-12 pb-32"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Architect Modal -->
+    <div id="profileModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-slide-up relative">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-2/5 h-80 md:h-auto bg-slate-800">
+                    <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=600&fit=crop" alt="Rudresh Chovatiya" class="w-full h-full object-cover grayscale brightness-75 hover:grayscale-0 transition-all duration-700">
+                </div>
+                <div class="p-8 md:p-10 flex-1">
+                    <div class="mb-6">
+                        <h3 class="text-3xl font-black text-white mb-1">Rudresh Chovatiya</h3>
+                        <p class="text-blue-400 font-mono text-sm tracking-wider uppercase">Lead AI & Data Architect</p>
+                    </div>
+                    <div class="space-y-6 text-slate-400 text-sm leading-relaxed">
+                        <p>Specializing in bridge-building between complex AI architectures and real-world business ROI. My work transforms raw data into actionable strategy across CV, NLP, and BI domains.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-950/50 p-3 rounded-xl border border-white/5">
+                                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Expertise</p>
+                                <p class="text-white font-bold">Python / CV / BI</p>
+                            </div>
+                            <div class="bg-slate-950/50 p-3 rounded-xl border border-white/5">
+                                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Architecture</p>
+                                <p class="text-white font-bold">Modular & Scalable</p>
+                            </div>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="window.open('https://rudresh-chovatiya.vercel.app/')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
+                                <i data-lucide="globe" class="w-4 h-4"></i> Official Portfolio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projectRolloutPlan = [
+            {
+                phase: "Phase 5: Tools & Data Automation",
+                title: "System Programming & Web Harvesting",
+                desc: "High-performance tools for developers and large-scale market acquisition.",
+                weeks: [
+                    {
+                        week: "Week 11", project: "Web Scraper Showcase",
+                        days: [
+                            { day: "Tuesday", title: "The Internet as a DB", hook: "Harvesting market intelligence.", content: "<b>Origin:</b> Competitor data is public but locked behind dynamic, JS-heavy web walls.<br><b>Execution:</b> Building a BeautifulSoup/Selenium hybrid scraper with a custom GUI.<br><b>Impact:</b> Real-time price tracking for ecommerce businesses to stay competitive." },
+                            { day: "Wednesday", title: "Parallel Speed Harvesting", hook: "Scraping 1,000 pages per hour.", content: "<b>Origin:</b> Single-threaded scraping is too slow for large-scale legal or retail data.<br><b>Execution:</b> Implementing Python Multiprocessing to run concurrent Selenium instances.<br><b>Impact:</b> Reliable data acquisition at a speed that traditional scrapers can't match." },
+                            { day: "Thursday", title: "Data Automation ROI", hook: "The 100% automated researcher.", content: "<b>Origin:</b> Companies spend thousands on manual research and data entry.<br><b>Execution:</b> Pining scraped data directly into cleaned SQL databases for BI review.<br><b>Impact:</b> Automated market intel that pays for itself in the first month of deployment." }
+                        ]
+                    },
+                    {
+                        week: "Week 10", project: "Cyber Forge: C++ Portal",
+                        days: [
+                            { day: "Tuesday", title: "The System-Level Gap", hook: "Back to the C++ roots.", content: "<b>Origin:</b> Modern web devs lack exposure to low-level high-performance engineering.<br><b>Execution:</b> Building a hub for live C++ projects compiled via WebAssembly.<br><b>Impact:</b> A developer forge that bridges the gap between hardware and high-speed web apps." },
+                            { day: "Wednesday", title: "Compiling for the Web", hook: "C++ speed in your browser.", content: "<b>Origin:</b> Complex system simulations are too slow for traditional JavaScript.<br><b>Execution:</b> Implementing C++ backends for high-speed mathematical computations.<br><b>Impact:</b> Sub-second execution of complex algorithms that would crash a standard site." },
+                            { day: "Thursday", title: "The Open-Source Forge", hook: "Scaling the developer hub.", content: "<b>Origin:</b> No centralized place exists to test and share system-level C++ challenges.<br><b>Execution:</b> Integrating Git-based workflows into the Cyber Forge platform.<br><b>Impact:</b> A growing community of engineers mastering the foundation of AI through C++." }
+                        ]
+                    }
+                ]
+            },
+            {
+                phase: "Phase 4: NLP & EdTech Systems",
+                title: "Linguistic AI & Educational Logic",
+                desc: "Scaling human-computer interaction through advanced text and voice suites.",
+                weeks: [
+                    {
+                        week: "Week 9", project: "DS Exam Portal",
+                        days: [
+                            { day: "Tuesday", title: "The Grading Bottleneck", hook: "Scaling technical education.", content: "<b>Origin:</b> Manually grading technical exams for 1,000+ students is impossible.<br><b>Execution:</b> Designing a React/Node-based automated assessment engine.<br><b>Impact:</b> A platform that can grade thousands of data science exams in seconds." },
+                            { day: "Wednesday", title: "Real-Time Logic Check", hook: "Fair grading for complex code.", content: "<b>Origin:</b> Static multiple-choice exams don't test actual data science ability.<br><b>Execution:</b> Building a logic-matching backend that evaluates student code submissions.<br><b>Impact:</b> High-integrity assessments that mirror real-world technical challenges." },
+                            { day: "Thursday", title: "Instant Feedback ROI", hook: "Learning at the speed of data.", content: "<b>Origin:</b> Students wait weeks for feedback, losing the learning momentum.<br><b>Execution:</b> Providing detailed automated scoring and error-breakdown instantly post-exam.<br><b>Impact:</b> 100% student satisfaction and significantly improved learning outcomes." }
+                        ]
+                    },
+                    {
+                        week: "Week 8", project: "NLP Suite: Text & Voice",
+                        days: [
+                            { day: "Tuesday", title: "The Unstructured Mess", hook: "Making text talk to code.", content: "<b>Origin:</b> Companies are drowning in customer feedback text they can't process.<br><b>Execution:</b> Building a unified suite featuring sentiment analysis and auto-summarization.<br><b>Impact:</b> Turning 10,000 monthly reviews into 3 pages of actionable strategy." },
+                            { day: "Wednesday", theme: "Execution", title: "Transformers & Attention", hook: "Context-aware AI.", content: "<b>Origin:</b> Traditional keyword search misses the emotional tone of the user.<br><b>Execution:</b> Integrating HuggingFace transformers and Coqui TTS for synthesis.<br><b>Impact:</b> AI that understands not just the words, but the intent behind them." },
+                            { day: "Thursday", title: "Voice-First Support", hook: "The human-AI bridge.", content: "<b>Origin:</b> Digital support feels robotic and lacks accessibility for diverse users.<br><b>Execution:</b> Implementing real-time Voice-to-Text and Text-to-Voice translation.<br><b>Impact:</b> Global customer service that speaks the user's language without human delay." }
+                        ]
+                    }
+                ]
+            },
+            {
+                phase: "Phase 3: Business Intelligence & Viz",
+                title: "Interactive Strategy Dashboards",
+                desc: "Turning millions of raw rows into real-time interactive business intelligence.",
+                weeks: [
+                    {
+                        week: "Week 7", project: "Live Urban Traffic Dashboard",
+                        days: [
+                            { day: "Tuesday", title: "Gridlock Visualization", hook: "Mapping the city's pulse.", content: "<b>Origin:</b> Urban planners lack real-time visibility into local congestion patterns.<br><b>Execution:</b> Analyzing traffic density data with Python (Plotly) and Power BI.<br><b>Impact:</b> Identifying specific intersections where 80% of urban bottlenecks occur." },
+                            { day: "Wednesday", title: "Temporal Traffic Flow", hook: "Predicting the next rush.", content: "<b>Origin:</b> Traffic management is reactive rather than proactive.<br><b>Execution:</b> Building time-series visualizations to track peak-hour surges.<br><b>Impact:</b> Data-backed scheduling for public transit to meet demand precisely when needed." },
+                            { day: "Thursday", title: "Infrastructure ROI", hook: "Investing where the cars are.", content: "<b>Origin:</b> Cities spend millions on roads based on outdated traffic studies.<br><b>Execution:</b> Providing a live dashboard that updates with seasonal traffic trends.<br><b>Impact:</b> Municipal planners can justify road investments with current, verifiable data." }
+                        ]
+                    },
+                    {
+                        week: "Week 6", project: "US Airline Delays Dashboard",
+                        days: [
+                            { day: "Tuesday", title: "The Flight Chaos Origin", hook: "Taming the sky's data.", content: "<b>Origin:</b> Post-2023 flight data was massive and unstructured, hiding the causes of delays.<br><b>Execution:</b> Building a multi-source ETL pipeline to merge airline, weather, and delay logs.<br><b>Impact:</b> Clear visibility into the root causes of cancellations across US aviation." },
+                            { day: "Wednesday", title: "Mechanical vs Weather", hook: "Identifying systemic bottlenecks.", content: "<b>Origin:</b> Airlines often blame weather for delays that are actually mechanical.<br><b>Execution:</b> Correlating aircraft metadata (age/type) with delay codes using Power Query.<br><b>Impact:</b> Actionable data for maintenance teams to predict and prevent groundings." },
+                            { day: "Thursday", title: "Smart Scheduling ROI", hook: "Avoiding the bottleneck airport.", content: "<b>Origin:</b> Scheduling flights into high-congestion airports during peak delays is a loss.<br><b>Execution:</b> Mapping heat-maps of airport-specific delay trends by time-of-day.<br><b>Impact:</b> Operational insights for airline logistics to re-route and reduce delay costs." }
+                        ]
+                    },
+                    {
+                        week: "Week 5", project: "Madhav Ecommerce Dashboard",
+                        days: [
+                            { day: "Tuesday", title: "The $2M Question", hook: "Finding hidden profit gaps.", content: "<b>Origin:</b> A high-volume ecommerce site lacked clarity on regional SKU performance.<br><b>Execution:</b> Building a Power BI engine to track 500+ categories over a multi-year span.<br><b>Impact:</b> Instant identification of underperforming regions and high-growth segments." },
+                            { day: "Wednesday", title: "DAX Power Logic", hook: "Calculations that drive strategy.", content: "<b>Origin:</b> Basic sales sums don't show the real story of Year-over-Year growth.<br><b>Execution:</b> Writing complex explicit DAX measures for profit margin and regional delta.<br><b>Impact:</b> C-suite executives can now make multi-million dollar decisions in 5 minutes." },
+                            { day: "Thursday", title: "Inventory IQ", hook: "Stocking what actually sells.", content: "<b>Origin:</b> Dead-stock was eating up 15% of the annual operating budget.<br><b>Execution:</b> Visualizing sales velocity against warehouse inventory levels in real-time.<br><b>Impact:</b> 20% reduction in storage costs by optimizing the supply chain based on data." }
+                        ]
+                    }
+                ]
+            },
+            {
+                phase: "Phase 2: Predictive & Agri-Analytics",
+                title: "Agricultural & Urban Forecasting",
+                desc: "Harnessing historical data to solve environmental and logistical urban problems.",
+                weeks: [
+                    {
+                        week: "Week 4", project: "NYC Taxi Fare Engine",
+                        days: [
+                            { day: "Tuesday", title: "The Pricing Mystery", hook: "Transparent urban transit.", content: "<b>Origin:</b> Taxi fares are unpredictable, leading to passenger distrust and driver disputes.<br><b>Execution:</b> Analyzing 1M+ NYC trip records to build a geospatial cost estimator.<br><b>Impact:</b> Clear, predictable pricing for passengers before they enter the vehicle." },
+                            { day: "Wednesday", title: "Feature Engineering Travel", hook: "Coding the rush hour.", content: "<b>Origin:</b> Straight-line distance doesn't reflect real-world city travel time.<br><b>Execution:</b> Implementing Haversine distance with temporal weights (Day/Holiday/Peak Hour).<br><b>Impact:</b> 15% increase in fare prediction accuracy by accounting for the city's pulse." },
+                            { day: "Thursday", title: "Fleet Optimization ROI", hook: "Driver profitability via data.", content: "<b>Origin:</b> Drivers spend 40% of their time 'deadheading' without passengers.<br><b>Execution:</b> Visualizing high-revenue pickup zones based on surge pricing predictions.<br><b>Impact:</b> 12% increase in driver earnings by aligning fleet location with demand." }
+                        ]
+                    },
+                    {
+                        week: "Week 3", project: "AgriCast360 (Soil Intelligence)",
+                        days: [
+                            { day: "Tuesday", title: "The Guesswork Gap", hook: "Soil is data, not dirt.", content: "<b>Origin:</b> Farmers rely on tradition instead of chemistry for crop selection.<br><b>Execution:</b> Aggregating Nitrogen, Phosphorus, and Potassium (NPK) levels with weather history.<br><b>Impact:</b> Providing scientifically accurate crop recommendations to maximize harvest success." },
+                            { day: "Wednesday", title: "Random Forest Modeling", hook: "Predicting yields with 92% accuracy.", content: "<b>Origin:</b> Simple linear models fail to capture the complex relationships in agricultural data.<br><b>Execution:</b> Training a Random Forest Regressor on 15k+ soil records and fine-tuning parameters.<br><b>Impact:</b> Delivering highly reliable predictions that help farmers secure financing based on data." },
+                            { day: "Thursday", title: "Precision Fertilizer ROI", hook: "Targeted application, higher profits.", content: "<b>Origin:</b> Over-fertilization costs farmers thousands and damages local groundwater.<br><b>Execution:</b> Mapping soil health visually to highlight precise nutrient-deficient zones.<br><b>Impact:</b> 20% reduction in chemical costs and a healthier, more sustainable harvest cycle." }
+                        ]
+                    }
+                ]
+            },
+            {
+                phase: "Phase 1: Computer Vision & Security",
+                title: "Real-Time Surveillance Architecture",
+                desc: "Deploying high-performance security modules using Python-native processing on edge devices.",
+                weeks: [
+                    {
+                        week: "Week 2", project: "Nirkhan Face Recognition Module",
+                        days: [
+                            { day: "Tuesday", title: "Beyond Motion Detection", hook: "Knowing who, not just what.", content: "<b>Origin:</b> Motion sensors trigger alerts for everything from pets to shadows.<br><b>Execution:</b> Adding a 128-dimensional face embedding layer to classify detected subjects.<br><b>Impact:</b> Reduced notification fatigue by 80% through smart white-listing." },
+                            { day: "Wednesday", title: "The Search Logic", hook: "Matching faces at scale.", content: "<b>Origin:</b> Searching a person database in real-time is computationally heavy.<br><b>Execution:</b> Optimizing binary search algorithms against serialized 'pickle' encoding files.<br><b>Impact:</b> Instant identification of staff and visitors even in high-traffic hallways." },
+                            { day: "Thursday", title: "Touchless Access ROI", hook: "Your face is the key.", content: "<b>Origin:</b> Physical keys and punch-cards are lost, shared, or unhygienic.<br><b>Execution:</b> Integrating the ID engine with hardware relays for automated door entry.<br><b>Impact:</b> Frictionless attendance and secure access control without recurring card costs." }
+                        ]
+                    },
+                    {
+                        week: "Week 1", project: "Nirkhan Surveillance Core",
+                        days: [
+                            { day: "Tuesday", title: "The Hardware Disruption", hook: "New life for legacy cameras.", content: "<b>Origin:</b> Small businesses are priced out of 4K security NVRs.<br><b>Execution:</b> Building a software layer using OpenCV to process raw camera feeds into smart streams.<br><b>Impact:</b> Providing enterprise-level security features at 90% lower hardware cost." },
+                            { day: "Wednesday", title: "Real-Time Optimization", hook: "Lag-free sentry systems.", content: "<b>Origin:</b> Traditional AI processing causes unusable frame delays in live tracking.<br><b>Execution:</b> Implementing a multi-threaded frame differencing engine for sub-50ms identification.<br><b>Impact:</b> Critical alerts delivered the moment movement occurs, not 10 seconds later." },
+                            { day: "Thursday", title: "Privacy-First Monitoring", hook: "Data sovereignty by design.", content: "<b>Origin:</b> Cloud surveillance leaks sensitive facial data to foreign servers.<br><b>Execution:</b> Processing all facial vectors locally and discarding raw video immediately post-inference.<br><b>Impact:</b> A secure system that meets GDPR standards for residential and office use." }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let currentPhaseIdx = 0;
+
+        function init() {
+            renderNav();
+            loadPhase(0);
+            lucide.createIcons();
+        }
+
+        function openModal() {
+            const modal = document.getElementById('profileModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('profileModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function renderNav() {
+            const container = document.getElementById('phaseTabs');
+            container.innerHTML = '';
+            projectRolloutPlan.forEach((phase, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-between group ${idx === currentPhaseIdx ? 'tab-active' : 'text-slate-500 hover:bg-slate-900 hover:text-slate-300'}`;
+                btn.onclick = () => {
+                    currentPhaseIdx = idx;
+                    renderNav();
+                    loadPhase(idx);
+                };
+                
+                // Extract Phase Number from the data string
+                const phaseNum = phase.phase.match(/\d+/)[0];
+                
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-[10px] opacity-60">PH-0${phaseNum}</span>
+                        <span class="truncate">Phase ${phaseNum}</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all"></i>
+                `;
+                container.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function loadPhase(idx) {
+            const data = projectRolloutPlan[idx];
+            document.getElementById('currentPhaseLabel').textContent = data.phase;
+            document.getElementById('phaseTitle').textContent = data.title;
+            document.getElementById('phaseDesc').textContent = data.desc;
+            
+            const grid = document.getElementById('projectGrid');
+            grid.innerHTML = '';
+
+            data.weeks.forEach((week, wIdx) => {
+                const weekSection = document.createElement('div');
+                weekSection.className = 'animate-slide-up';
+                weekSection.style.animationDelay = `${wIdx * 100}ms`;
+
+                let daysHtml = '';
+                week.days.forEach((day, dIdx) => {
+                    const icon = dIdx === 0 ? 'zap' : dIdx === 1 ? 'cpu' : 'trending-up';
+                    
+                    daysHtml += `
+                        <div class="glass-panel rounded-2xl p-6 border border-white/5 hover:border-blue-500/30 transition-all duration-300 shadow-xl phase-gradient group/card">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                                        <i data-lucide="${icon}" class="w-4 h-4"></i>
+                                    </div>
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">${day.day} Rollout</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded bg-blue-500/10 text-[9px] font-black text-blue-400 border border-blue-500/20 uppercase">O-E-I Verified</span>
+                            </div>
+                            
+                            <h4 class="text-white font-bold text-xl mb-2 leading-snug group-hover/card:text-blue-400 transition-colors">${day.title}</h4>
+                            <p class="text-sm text-blue-300 italic mb-6 font-serif">"${day.hook}"</p>
+                            
+                            <div class="text-[13px] text-slate-400 leading-relaxed mb-6 flex-grow content-block overflow-y-auto custom-scroll pr-2 max-h-72">
+                                ${day.content}
+                            </div>
+                            
+                            <div class="pt-6 border-t border-slate-800/50 flex justify-between items-center mt-auto">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Architecture Log</span>
+                                </div>
+                                <button class="text-slate-500 hover:text-white transition-colors" title="Copy Strategy">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                weekSection.innerHTML = `
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="px-4 py-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg text-white font-black text-sm shadow-lg shadow-blue-500/20">
+                            ${week.week}
+                        </div>
+                        <h3 class="text-2xl font-bold text-white tracking-tight">${week.project}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        ${daysHtml}
+                    </div>
+                `;
+                grid.appendChild(weekSection);
+            });
+            lucide.createIcons();
+            
+            const prog = ((idx + 1) / projectRolloutPlan.length) * 100;
+            document.getElementById('mainProgress').style.width = `${prog}%`;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

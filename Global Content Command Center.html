@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Content Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Region Gradients */
+        .card-gradient-apac { border-left: 4px solid #f97316; background: linear-gradient(90deg, rgba(249, 115, 22, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .card-gradient-eu   { border-left: 4px solid #3b82f6; background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .card-gradient-amer { border-left: 4px solid #10b981; background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%); }
+
+        .status-checkbox:checked + div { text-decoration: line-through; color: #64748b; }
+        
+        .tab-active { background: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Content Formatting */
+        .content-block b { color: #93c5fd; font-weight: 700; display: inline-block; margin-top: 6px; }
+        .content-block ul { list-style-type: disc; padding-left: 1.2rem; margin-top: 0.5rem; }
+        .content-block li { margin-bottom: 0.25rem; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700 bg-slate-900/80 flex items-center justify-between px-6 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i data-lucide="layout-grid" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-white tracking-tight">Content <span class="text-blue-400">Command Center</span></h1>
+                <p class="text-[10px] text-slate-400 font-mono uppercase tracking-widest">Global Master Plan (24 Weeks)</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="relative group">
+                <input type="text" id="searchInput" placeholder="Search topics..." class="bg-slate-800 border border-slate-700 rounded-full px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-48 transition-all focus:w-64 text-slate-300">
+                <i data-lucide="search" class="w-3 h-3 text-slate-500 absolute right-3 top-2"></i>
+            </div>
+            <div class="h-8 w-px bg-slate-700"></div>
+            <div class="flex gap-1 text-[10px] font-bold uppercase text-slate-500">
+                <div class="flex items-center gap-1 px-2 py-1 bg-orange-500/10 text-orange-400 rounded"><i data-lucide="sun" class="w-3 h-3"></i> APAC</div>
+                <div class="flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 rounded"><i data-lucide="clock" class="w-3 h-3"></i> EU/MEA</div>
+                <div class="flex items-center gap-1 px-2 py-1 bg-green-500/10 text-green-400 rounded"><i data-lucide="moon" class="w-3 h-3"></i> AMER</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar (Months) -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-700 flex flex-col z-10">
+            <div class="p-4">
+                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Campaign Timeline</h2>
+                <div class="space-y-1" id="monthTabs"></div>
+            </div>
+            
+            <div class="mt-auto p-4 border-t border-slate-800">
+                <div class="bg-slate-800 rounded-xl p-4">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-xs text-slate-400">Completion</span>
+                        <span class="text-xl font-bold text-white" id="progressText">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-auto bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-[#0f172a] relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-transparent to-purple-900/10 pointer-events-none"></div>
+            
+            <div class="max-w-7xl mx-auto p-8 relative z-0">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-2" id="currentMonthTitle">Month 1: Foundations</h2>
+                        <p class="text-slate-400 max-w-2xl" id="currentMonthDesc">Focus on Python Performance, SQL Logic & System Design.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="expandAll()" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">Expand All</button>
+                        <button onclick="collapseAll()" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">Collapse All</button>
+                    </div>
+                </div>
+
+                <div id="contentGrid" class="space-y-8 pb-20"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Data Source -->
+    <script>
+        // MASTER 24-WEEK CONTENT PLAN
+        const contentPlan = [
+            {
+                month: "Month 1",
+                title: "Foundations & Code Core",
+                desc: "Focus: Python Basics, Memory Management, SQL Architecture, and NumPy Performance.",
+                weeks: [
+                    {
+                        week: "Week 1",
+                        theme: "Python Internals & Logic",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", time: "Morning", tone: "Innovation", title: "Type Casting & Memory", 
+                                  hook: "Do you know what Python's `id()` function actually returns? It's not just a random number.",
+                                  content: "<b>Context:</b> Python handles memory efficiently. Small numbers (-5 to 256) are 'interned', meaning they exist once in memory and are shared.<br><b>Example:</b> If you create two variables `a=10` and `b=10`, they literally point to the same spot in memory.<br><b>Project Ref:</b> `DS Exam Portal` (Scoring Logic).<br><b>Animated Visual:</b> The Snake Mascot holding two balloons labeled 'a' and 'b'. Both strings lead to the exact same floating box labeled '10'." },
+                                { region: "EU", time: "Noon", tone: "Structure", title: "Mutability Traps", 
+                                  hook: "The bug hiding in your default arguments: `def func(l=[]):`",
+                                  content: "<b>Context:</b> Lists are 'mutable' (changeable). If you set an empty list as a default argument, it keeps growing every time you run the function.<br><b>Example:</b> Running a 'shopping cart' function twice adds items to the *previous* customer's cart.<br><b>Project Ref:</b> `Web Scraper Showcase` (Data Lists).<br><b>Animated Visual:</b> The Snake putting an apple in a backpack. When a new Snake arrives, the apple is mysteriously still there." },
+                                { region: "AMER", time: "Evening", tone: "Growth", title: "List Comp ROI", 
+                                  hook: "I rewrote 50 lines of loops into 3 lines. Here is the result.",
+                                  content: "<b>Context:</b> List Comprehensions are a faster, cleaner way to create lists than standard loops.<br><b>Example:</b> `[x*2 for x in nums]` runs faster than a 3-line for-loop.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction` (Feature Eng).<br><b>Animated Visual:</b> A slow, chugging steam train labeled 'For Loop' losing a race to a sleek bullet train labeled 'List Comp'." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Lambda & Map", hook: "Anonymous functions are cleaner. Stop defining `def` for one-liners.", content: "<b>Context:</b> Lambdas are tiny functions you write in one line. Combined with Map, they process huge data lists instantly.<br><b>Example:</b> Converting a list of prices from Dollars to Euros in one line.<br><b>Project Ref:</b> `AgriCast360` (Data Cleaning).<br><b>Animated Visual:</b> The Snake swallowing a raw number block and instantly spitting out a processed, polished block." },
+                                { region: "EU", title: "Robust Exceptions", hook: "Production code must not crash. The `try...except...finally` pattern.", content: "<b>Context:</b> Errors happen. Good code catches them gracefully instead of exploding.<br><b>Example:</b> If a file is missing, show a message instead of crashing the app.<br><b>Project Ref:</b> `Web Scraper Showcase` (Error Handling).<br><b>Animated Visual:</b> The Snake sliding on ice. Instead of crashing into a wall, it deploys a parachute labeled 'Except'." },
+                                { region: "AMER", title: "OS Module", hook: "How I used Python to organize 1000 files in 10 seconds.", content: "<b>Context:</b> The `OS` module gives Python control over your computer's folders and files.<br><b>Example:</b> Moving all .jpg files to an 'Images' folder automatically.<br><b>Project Ref:</b> `C++ Projects Portal` (File Mgmt).<br><b>Animated Visual:</b> The Snake acting as a traffic cop, blowing a whistle and directing file icons into their correct folders." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Loops", hook: "Visualizing `While` vs `For` loops with the Friendly Snake.", content: "<b>Context:</b> `While` runs until a condition stops it. `For` runs a specific number of times.<br><b>Example:</b> While: Eat until full. For: Take 10 steps.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Frame Loops).<br><b>Animated Visual:</b> 'While': Snake eating apples until a counter hits 0. 'For': Snake hopping exactly 5 tiles forward." },
+                                { region: "EU", title: "Project Structure", hook: "Stop dumping everything in `main.py`. Use Packages.", content: "<b>Context:</b> Large projects need organization. `__init__.py` turns a folder into a Python package.<br><b>Example:</b> Separating 'Database' logic from 'UI' logic.<br><b>Project Ref:</b> `NLP Suite: Text` (Folder Structure).<br><b>Animated Visual:</b> The Snake organizing a messy pile of bricks into a neat house with separate rooms." },
+                                { region: "AMER", title: "My First Script", hook: "The first time I printed 'Hello World' vs my first paid script.", content: "<b>Context:</b> Every expert started with `print('Hello World')`.<br><b>Example:</b> My journey from syntax errors to building complex apps.<br><b>Project Ref:</b> `AgriCast360` (First Major App).<br><b>Animated Visual:</b> A baby Snake saying 'Hello' morphing into a giant, cool Snake coding on a laptop." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 2",
+                        theme: "Advanced Python & Web Scraping",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Decorators", hook: "Wrap your functions. The power of `@decorators`.", content: "<b>Context:</b> Decorators add super-powers to functions without changing their code.<br><b>Example:</b> Adding a timer to measure how long a function takes.<br><b>Project Ref:</b> `DS Exam Portal` (Auth Logging).<br><b>Animated Visual:</b> The Snake putting on a superhero cape (Decorator) before flying off to do a task." },
+                                { region: "EU", title: "OOP Encapsulation", hook: "Private variables in Python? It's a lie. (Sort of).", content: "<b>Context:</b> We use `__double_underscore` to hide data inside classes so it can't be messed with.<br><b>Example:</b> Protecting a bank account balance variable.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Classes).<br><b>Animated Visual:</b> The Snake putting a treasure chest (variable) inside a safe and locking it." },
+                                { region: "AMER", title: "Scraping ROI", hook: "Requests vs Selenium: When to use which.", content: "<b>Context:</b> `Requests` is fast but blind. `Selenium` is slow but can 'see' and click.<br><b>Example:</b> Scraping a static blog vs a dynamic React app.<br><b>Project Ref:</b> `Web Scraper Showcase`.<br><b>Animated Visual:</b> A ninja (Requests) grabbing data silently vs a robot (Selenium) physically clicking buttons." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "BS4 Hacks", hook: "Parsing HTML faster. CSS Selectors > `find_all`.", content: "<b>Context:</b> CSS selectors let you pinpoint data on a webpage instantly.<br><b>Example:</b> `soup.select('div.price')` vs looping through all divs.<br><b>Project Ref:</b> `Web Scraper Showcase`.<br><b>Animated Visual:</b> Snake wearing sniper goggles and picking specific red berries from a messy bush." },
+                                { region: "EU", title: "Scraping Ethics", hook: "Respect `robots.txt`. Don't get your IP banned.", content: "<b>Context:</b> Every site has rules for bots. Ignoring them gets you blocked.<br><b>Example:</b> Checking allowed paths before scraping.<br><b>Project Ref:</b> `Web Scraper Showcase`.<br><b>Animated Visual:</b> Snake reading a 'Keep Out' sign before entering a garden, then finding the open gate." },
+                                { region: "AMER", title: "Data -> Value", hook: "How extracting data leads to insights.", content: "<b>Context:</b> Raw data is useless. Processed data is gold.<br><b>Example:</b> Scraping competitor prices to adjust your own.<br><b>Project Ref:</b> `AgriCast360` (Data Sourcing).<br><b>Animated Visual:</b> Snake putting raw grey stones into a machine that turns them into gold coins." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual OOP", hook: "Classes are blueprints. Objects are houses.", content: "<b>Context:</b> A Class defines the shape. An Object is the actual thing built from it.<br><b>Example:</b> 'Car' is a class. 'My Red Toyota' is an object.<br><b>Project Ref:</b> `C++ Projects Portal`.<br><b>Animated Visual:</b> Snake using a blue blueprint to 3D print different colored houses." },
+                                { region: "EU", title: "Roadmap", hook: "Mastering Python: My recommended path.", content: "<b>Context:</b> Don't learn everything. Learn what matters for Data Science.<br><b>Example:</b> Skip GameDev libraries, focus on Pandas.<br><b>Project Ref:</b> `DS Exam Portal` (Curriculum).<br><b>Animated Visual:</b> Snake sliding along a game-board path marked with milestones like 'Basics', 'OOP', 'Data'." },
+                                { region: "AMER", title: "Debugging", hook: "The bug that kept me up all night.", content: "<b>Context:</b> Sometimes the smallest typo causes the biggest crash.<br><b>Example:</b> A missing comma in a dictionary.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Debugging).<br><b>Animated Visual:</b> Snake using a magnifying glass to find a tiny flea (bug) on a giant code wall." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 3",
+                        theme: "SQL & Database Architecture",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Visual Joins", hook: "Left, Right, Inner, Outer. Stop guessing.", content: "<b>Context:</b> Joins combine data from two tables based on a common key.<br><b>Example:</b> Matching 'Users' with their 'Orders'.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Two overlapping circles (Venn Diagram) lighting up in different intersections as the Snake points." },
+                                { region: "EU", title: "Normalization", hook: "Why redundancy is the enemy.", content: "<b>Context:</b> Storing data efficiently to avoid duplicates (3NF).<br><b>Example:</b> Storing the city name once, not for every user.<br><b>Project Ref:</b> `DS Exam Portal` (DB Schema).<br><b>Animated Visual:</b> Snake tidying up a messy room, putting duplicate toys into a single shared box." },
+                                { region: "AMER", title: "SQL Value", hook: "Why every manager needs `SELECT *`.", content: "<b>Context:</b> Direct access to data speeds up decisions.<br><b>Example:</b> Checking sales numbers without waiting for a report.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Snake bypassing a long waiting line to walk straight into the data vault." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Window Functions", hook: "The power of `OVER()` and `PARTITION BY`.", content: "<b>Context:</b> Calculating rankings or totals without collapsing the data rows.<br><b>Example:</b> Ranking students in each class.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake looking through a sliding window at a moving train, counting passengers." },
+                                { region: "EU", title: "CRUD", hook: "Create, Read, Update, Delete.", content: "<b>Context:</b> The 4 fundamental operations of any database.<br><b>Example:</b> Posting, Viewing, Editing, and Deleting a comment.<br><b>Project Ref:</b> `DS Exam Portal` (Backend).<br><b>Animated Visual:</b> Snake Planting a flower (Create), Smelling it (Read), Watering it (Update), and Picking it (Delete)." },
+                                { region: "AMER", title: "Optimization", hook: "How a bad query crashed production.", content: "<b>Context:</b> Missing indexes forces the DB to read every single row.<br><b>Example:</b> Searching a library without an index card system.<br><b>Project Ref:</b> `AgriCast360` (Query Opt).<br><b>Animated Visual:</b> A fat Snake getting stuck in a small pipe vs a slim Snake sliding through fast." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual SQL", hook: "Data tables are spreadsheets on steroids.", content: "<b>Context:</b> Relational databases link data together securely.<br><b>Example:</b> Linking a Customer ID to a Transaction.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake drawing strings connecting different clipboards to show relationships." },
+                                { region: "EU", title: "Cheat Sheet", hook: "Top 10 SQL Commands used daily.", content: "<b>Context:</b> The essential vocabulary: WHERE, GROUP BY, HAVING.<br><b>Example:</b> Filtering users over 18.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Snake unrolling a long magical scroll with glowing commands written on it." },
+                                { region: "AMER", title: "Primary Keys", hook: "Trust your data. Primary vs Foreign Keys.", content: "<b>Context:</b> Unique IDs ensure we never confuse two different things.<br><b>Example:</b> Student ID vs Name (there can be two John Smiths).<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Snake using a unique golden key to unlock a specific door among thousands." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 4",
+                        theme: "NumPy & High-Performance Math",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Broadcasting", hook: "Adding a scalar to a matrix without loops?", content: "<b>Context:</b> NumPy smartly stretches small arrays to match big ones.<br><b>Example:</b> Adding 5 to a list of [1, 2, 3] instantly.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> A small brick stretching elastically to cover a large wall perfectly." },
+                                { region: "EU", title: "Datatypes", hook: "Int8 vs Int64. Save memory.", content: "<b>Context:</b> Choosing the right box size for your numbers saves RAM.<br><b>Example:</b> Using a small box for numbers 1-100.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard` (Memory).<br><b>Animated Visual:</b> Snake trying to fit a giant ball in a small box (fail) vs a perfect fit." },
+                                { region: "AMER", title: "Vectorization", hook: "Why NumPy is 50x faster than Lists.", content: "<b>Context:</b> Processing entire arrays at once (SIMD) instead of one by one.<br><b>Example:</b> Multiplying two columns of numbers.<br><b>Project Ref:</b> `Green Taxi Estimator` (Feature Eng).<br><b>Animated Visual:</b> One Snake moving one brick at a time vs a Conveyor belt moving 100 bricks at once." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Slicing", hook: "Accessing tensor data like a pro.", content: "<b>Context:</b> `arr[:, 1]` grabs all rows, column 1. Essential for image processing.<br><b>Example:</b> Cropping a photo.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Arrays).<br><b>Animated Visual:</b> Snake using a laser to slice a 3D cube of jelly instantly." },
+                                { region: "EU", title: "Matrix Ops", hook: "Dot products made simple.", content: "<b>Context:</b> Multiplying rows by columns. The core of Neural Networks.<br><b>Example:</b> Calculating total revenue (Price x Quantity).<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Rows and Columns dancing, meeting in the middle, and merging into a single number." },
+                                { region: "AMER", title: "Foundation", hook: "NumPy is the base of Pandas/Sklearn.", content: "<b>Context:</b> Almost every Python data tool is built on top of NumPy.<br><b>Example:</b> Pandas DataFrames are just fancy NumPy arrays.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> A pyramid with 'NumPy' as the massive bottom block supporting everything else." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Arrays", hook: "Lists are slow trains. Arrays are bullet trains.", content: "<b>Context:</b> Arrays store data next to each other in memory (Contiguous).<br><b>Example:</b> Speed difference in calculation.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Visual race between a chugging steam train (List) and a sleek maglev train (Array)." },
+                                { region: "EU", title: "Reshape", hook: "Reading the Docs: `reshape` vs `resize`.", content: "<b>Context:</b> Changing the shape of data without changing the data itself.<br><b>Example:</b> Turning a list of 10 items into a 2x5 grid.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake reshaping a clay block from a square to a long rectangle without adding clay." },
+                                { region: "AMER", title: "Quiz", hook: "Can you answer this NumPy interview question?", content: "<b>Context:</b> Testing understanding of array dimensions.<br><b>Example:</b> What is the shape of a 3x3 matrix?<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> A question mark box bouncing, then opening to reveal the answer." }
+                            ]}
+                        ]
+                    }
+                ]
+            },
+            {
+                month: "Month 2",
+                title: "Analysis & Mathematics",
+                desc: "Focus: Pandas Manipulation, Statistics, Probability, and Cleaning.",
+                weeks: [
+                    {
+                        week: "Week 5",
+                        theme: "Pandas DataFrames",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "GroupBy Power", hook: "Split, Apply, Combine. The mantra of Analysis.", content: "<b>Context:</b> Breaking data into chunks, calculating stats, and merging.<br><b>Example:</b> Finding average sales per country.<br><b>Project Ref:</b> `AgriCast360` (Aggregation).<br><b>Animated Visual:</b> Snake sorting mixed fruit into baskets, weighing them, and writing tags." },
+                                { region: "EU", title: "Missing Data", hook: "Drop it or Fill it? Strategies for NaNs.", content: "<b>Context:</b> `fillna()` fills gaps, `dropna()` removes them. Choose wisely.<br><b>Example:</b> Replacing missing age with the average age.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake filling potholes in a road with cement so cars can drive smoothly." },
+                                { region: "AMER", title: "Excel Killer", hook: "Why I stopped using VLOOKUP for `pd.merge`.", content: "<b>Context:</b> Pandas handles millions of rows instantly, Excel crashes.<br><b>Example:</b> Merging Customer and Sales tables.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Excel logo spinning and crashing, Pandas logo running smoothly." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Pivot Tables", hook: "Summarizing millions of rows in milliseconds.", content: "<b>Context:</b> Reshaping data to see patterns.<br><b>Example:</b> Summarizing monthly sales by product category.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake rotating a Rubik's cube to show different faces of the same data." },
+                                { region: "EU", title: "Series vs DF", hook: "Know your data structures.", content: "<b>Context:</b> A Series is 1D (like a list). A DataFrame is 2D (like a table).<br><b>Example:</b> A single column vs a whole spreadsheet.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> A single playing card floating vs a full deck spread out on a table." },
+                                { region: "AMER", title: "Insight", hook: "Turning raw csv into monthly reports.", content: "<b>Context:</b> Automating boring office work with Python.<br><b>Example:</b> Generating PDF reports from Excel files.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> A messy pile of paper flying into a machine and coming out as a neat graph." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Tables", hook: "Organizing chaotic data.", content: "<b>Context:</b> Dataframes provide structure to unstructured data.<br><b>Example:</b> Turning log files into a table.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Snake catching falling Tetris blocks and arranging them perfectly into a wall." },
+                                { region: "EU", title: "Best Practices", hook: "Chaining methods for readable code.", content: "<b>Context:</b> Using `.query().groupby().mean()` flows like a sentence.<br><b>Example:</b> Filter -> Group -> Average.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake linking multiple metal chain links together to pull a weight." },
+                                { region: "AMER", title: "Cleaning Story", hook: "The dirty dataset that almost got me fired.", content: "<b>Context:</b> Handling weird data formats like mixed dates (US vs UK).<br><b>Example:</b> '12/01/2023' - is it Jan 12th or Dec 1st?<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Snake juggling messy mud balls, cleaning them, and stacking them neatly." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 6",
+                        theme: "Stats & Probability",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Bayes Theorem", hook: "Updating probabilities with new evidence.", content: "<b>Context:</b> How prior knowledge changes the odds of an event.<br><b>Example:</b> Probability of rain given it is cloudy.<br><b>Project Ref:</b> `Green Taxi Estimator` (Prob. Logic).<br><b>Animated Visual:</b> Snake looking at weather clouds to update its calculated chance of going outside." },
+                                { region: "EU", title: "Hypothesis Testing", hook: "Null vs Alternate. Proving your point.", content: "<b>Context:</b> Testing if a result is real or just luck.<br><b>Example:</b> Did the new drug actually cure the patient?<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard` (Sales A/B).<br><b>Animated Visual:</b> Snake judge holding a gavel and scales, weighing evidence." },
+                                { region: "AMER", title: "P-Value", hook: "What does p<0.05 actually mean?", content: "<b>Context:</b> It means there is less than 5% chance the result is random.<br><b>Example:</b> Scientific proof standards.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> A 'Guilty' vs 'Not Guilty' meter swinging based on evidence." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Distributions", hook: "Normal, Poisson, Binomial.", content: "<b>Context:</b> The shape of data tells us its behavior.<br><b>Example:</b> Heights of people (Normal) vs coin flips (Binomial).<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Snake sliding over hills of different shapes (Bell curve, skewed ramp)." },
+                                { region: "EU", title: "CLT", hook: "Why everything looks like a Bell Curve.", content: "<b>Context:</b> Central Limit Theorem: Averages of samples tend to be Normal.<br><b>Example:</b> Rolling dice many times.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Random balls dropping into a Galton Board and naturally forming a smooth curve." },
+                                { region: "AMER", title: "A/B Testing", hook: "How Netflix picks thumbnails.", content: "<b>Context:</b> Comparing Group A vs Group B to see which performs better.<br><b>Example:</b> Red button vs Blue button.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake showing two different movie posters to an audience and counting claps." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Bell", hook: "Visualizing the Normal Distribution.", content: "<b>Context:</b> 68-95-99.7 Rule of standard deviation.<br><b>Example:</b> IQ scores or Height.<br><b>Project Ref:</b> `DS Exam Portal` (Scores).<br><b>Animated Visual:</b> Snake stretching across a Bell Curve to measure the width of standard deviations." },
+                                { region: "EU", title: "Cheat Sheet", hook: "Mean, Median, Mode.", content: "<b>Context:</b> The three M's of summary statistics.<br><b>Example:</b> Average income vs Median income.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Three snakes standing next to each other, measuring themselves to find the average." },
+                                { region: "AMER", title: "Math Phobia", hook: "You don't need a PhD for DS.", content: "<b>Context:</b> Intuition is more important than memorizing formulas.<br><b>Example:</b> Understanding logic vs solving integrals.<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Scary floating math symbols turning into friendly emojis." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 7",
+                        theme: "Preprocessing & Cleaning",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Outliers", hook: "Z-Score vs IQR. Catching anomalies.", content: "<b>Context:</b> Detecting data points that don't fit the pattern.<br><b>Example:</b> A transaction of $1M when average is $50.<br><b>Project Ref:</b> `Credit Card EDA Showcase` (Fraud).<br><b>Animated Visual:</b> Snake spotting a bright red apple in a basket of green apples and picking it out." },
+                                { region: "EU", title: "MICE", hook: "Advanced Imputation strategies.", content: "<b>Context:</b> MICE predicts missing values using other columns.<br><b>Example:</b> Guessing weight based on height and age.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake using a magic wand to repair broken bridge planks with the perfect fit." },
+                                { region: "AMER", title: "Garbage In", hook: "The #1 rule of ML.", content: "<b>Context:</b> If you feed bad data, you get bad predictions.<br><b>Example:</b> Training a cat detector on pictures of dogs.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Robot eating trash bags and outputting junk cubes." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Scaling", hook: "MinMax vs Standard. When to use what?", content: "<b>Context:</b> Putting features on the same scale so the model isn't biased.<br><b>Example:</b> Comparing Salary (100k) with Age (30).<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake shrinking a giant and growing a dwarf so they are the same size for a fair fight." },
+                                { region: "EU", title: "Encoding", hook: "One-Hot vs Label Encoding.", content: "<b>Context:</b> Converting text categories to numbers computers understand.<br><b>Example:</b> Red=1, Blue=2 vs Red=[1,0], Blue=[0,1].<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake putting 'Red', 'Blue', 'Green' stickers into numbered slots." },
+                                { region: "AMER", title: "Pipelines", hook: "Automating the cleaning process.", content: "<b>Context:</b> Scikit-learn Pipelines ensure reproducibility.<br><b>Example:</b> Raw Data -> Clean -> Scale -> Model.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> A factory assembly line cleaning, painting, and packing products automatically." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Clean", hook: "Scrubbing the dirt off data.", content: "<b>Context:</b> Cleaning is 80% of the Data Science job.<br><b>Example:</b> Fixing typos, removing duplicates.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Snake using a sponge and soap to wash muddy data blocks until they shine." },
+                                { region: "EU", title: "Transforms", hook: "Log Transform & Box-Cox.", content: "<b>Context:</b> Making skewed data look Normal (Bell shaped).<br><b>Example:</b> Fixing income distribution.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake squeezing a lopsided balloon until it's perfectly round." },
+                                { region: "AMER", title: "Real Data", hook: "Real data is never clean.", content: "<b>Context:</b> Dealing with the messiness of the real world.<br><b>Example:</b> Dates formatted as text, numbers with commas.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Snake navigating a messy obstacle course of trash and rubble." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 8",
+                        theme: "Linear Algebra",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Dot Product", hook: "The most important operation in AI.", content: "<b>Context:</b> Measuring how similar two vectors are.<br><b>Example:</b> Recommendation systems matching user to movie.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Two arrows (vectors) aligning and glowing bright when they match direction." },
+                                { region: "EU", title: "Eigenvectors", hook: "The DNA of a matrix.", content: "<b>Context:</b> Directions that don't change during transformation.<br><b>Example:</b> Rotating a 3D object.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> A spinning globe where the axis stays perfectly still (Eigenvector)." },
+                                { region: "AMER", title: "Dimensions", hook: "Why high dimensions are scary.", content: "<b>Context:</b> Curse of Dimensionality: Data becomes sparse.<br><b>Example:</b> Finding a needle in a haystack vs a field.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake getting lost in a 10-dimensional maze where up/down doesn't exist." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "PCA", hook: "Crushing 100 dimensions into 2.", content: "<b>Context:</b> Principal Component Analysis simplifies data.<br><b>Example:</b> Compressing an image.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Face Recog).<br><b>Animated Visual:</b> A 3D shadow of a Snake projected onto a 2D wall, keeping the shape." },
+                                { region: "EU", title: "Matrices", hook: "Identity, Diagonal, Sparse.", content: "<b>Context:</b> Different types of matrices used in ML.<br><b>Example:</b> Sparse matrix for text data.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake organizing scattered numbers into a perfect grid." },
+                                { region: "AMER", title: "Search", hook: "How search engines use Algebra.", content: "<b>Context:</b> Vector Search finds closest matches.<br><b>Example:</b> Google Search.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake floating in space, finding the closest bright star to it." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Vectors", hook: "Arrows in space.", content: "<b>Context:</b> Vectors have magnitude and direction.<br><b>Example:</b> Physics velocity.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake flying straight like an arrow to hit a target." },
+                                { region: "EU", title: "Math Syllabus", hook: "How much math do you ACTUALLY need?", content: "<b>Context:</b> Focus on Linear Algebra & Calculus logic.<br><b>Example:</b> Gradient Descent derivatives.<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Snake checking items off a clipboard labeled 'Math Skills'." },
+                                { region: "AMER", title: "Learning", hook: "Don't get stuck on theory.", content: "<b>Context:</b> Learn just enough to build.<br><b>Example:</b> Code first, math later.<br><b>Project Ref:</b> `C++ Projects Portal`.<br><b>Animated Visual:</b> Snake building a lego tower while reading the instructions step-by-step." }
+                            ]}
+                        ]
+                    }
+                ]
+            },
+            {
+                month: "Month 3",
+                title: "Viz & Supervised Learning",
+                desc: "Focus: Power BI, Regression, Classification, and Ensembles.",
+                weeks: [
+                    {
+                        week: "Week 9",
+                        theme: "Power BI & Visualization",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "DAX Measures", hook: "Stop using drag-and-drop. Use Explicit Measures.", content: "<b>Context:</b> Explicit measures are reusable code formulas.<br><b>Example:</b> Total Sales = SUM(Sales[Amount]).<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Snake writing a formula on a blackboard that instantly turns into a chart." },
+                                { region: "EU", title: "Star Schema", hook: "Why Snowflake schema is a trap.", content: "<b>Context:</b> Star schema is faster and simpler for BI.<br><b>Example:</b> One fact table, many dimension tables.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> A central Star (Fact Table) connecting to orbiting planets (Dimensions)." },
+                                { region: "AMER", title: "Dashboard UX", hook: "The 5-second rule for dashboards.", content: "<b>Context:</b> Users should understand the data in 5 seconds.<br><b>Example:</b> Clean layout vs Cluttered mess.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> A messy dashboard rearranging itself into a clean, easy-to-read layout." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "CALCULATE", hook: "The most powerful function in DAX.", content: "<b>Context:</b> Modifying filter context dynamically.<br><b>Example:</b> Sales for 'Blue' products only.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake using a magic filter lens to look at the data, changing its color." },
+                                { region: "EU", title: "Context", hook: "Row vs Filter Context.", content: "<b>Context:</b> Understanding where your calculation applies.<br><b>Example:</b> Calculating tax for one row vs total tax.<br><b>Project Ref:</b> `U.S. Airline Delays Dashboard`.<br><b>Animated Visual:</b> Snake looking through a telescope (Filter) vs reading a single line (Row)." },
+                                { region: "AMER", title: "Storytelling", hook: "Don't just show data. Tell a story.", content: "<b>Context:</b> Narrative visualization leads to action.<br><b>Example:</b> Revenue is down -> Here is why.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Charts animating in sequence to tell a story like a comic book." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Charts", hook: "From numbers to pictures.", content: "<b>Context:</b> Choosing the right chart for the data.<br><b>Example:</b> Line for trends, Bar for comparison.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Numbers falling down and stacking up into colorful bar charts." },
+                                { region: "EU", title: "Power Query", hook: "The ETL powerhouse.", content: "<b>Context:</b> Cleaning data before visualization.<br><b>Example:</b> Unpivoting columns.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake washing dirty vegetables before cooking them into a meal." },
+                                { region: "AMER", title: "BI Roles", hook: "BI vs Data Science.", content: "<b>Context:</b> Analyzing the past (BI) vs Predicting the future (DS).<br><b>Example:</b> Dashboard vs Model.<br><b>Project Ref:</b> `AgriCast360` (BI Role).<br><b>Animated Visual:</b> Snake deciding between a Chart (BI) and a Robot (DS)." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 10",
+                        theme: "Regression Algorithms",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Gradient Descent", hook: "Walking down a mountain blindfolded.", content: "<b>Context:</b> How models learn by minimizing error step-by-step.<br><b>Example:</b> Adjusting weights to reduce loss.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snake sliding down a 3D valley to find the lowest point (Minimum)." },
+                                { region: "EU", title: "Assumptions", hook: "Regression isn't magic. It has rules.", content: "<b>Context:</b> Linearity, Homoscedasticity, Normality.<br><b>Example:</b> Checking if data fits a line.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake checking if a line is straight using a ruler and nodding." },
+                                { region: "AMER", title: "Prediction", hook: "Predicting House Prices.", content: "<b>Context:</b> Linear Regression application.<br><b>Example:</b> Price = Size * X + Location * Y.<br><b>Project Ref:</b> `Green Taxi Estimator` (Regression).<br><b>Animated Visual:</b> Snake guessing the price of a house based on its size and getting it right." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Regularization", hook: "Lasso vs Ridge.", content: "<b>Context:</b> Penalizing large weights to prevent overfitting.<br><b>Example:</b> Keeping the model simple.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake tightening a belt (Lasso) to slim down and fit." },
+                                { region: "EU", title: "Metrics", hook: "RMSE vs MAE.", content: "<b>Context:</b> Measuring how wrong the model is.<br><b>Example:</b> Root Mean Square Error penalizes big errors.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snake measuring the distance between points and the prediction line." },
+                                { region: "AMER", title: "Bias-Variance", hook: "The trade-off of ML.", content: "<b>Context:</b> Underfitting (too simple) vs Overfitting (too complex).<br><b>Example:</b> Goldilocks zone.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake trying to fit into a box that is too big, then too small, then perfect." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Fit", hook: "Drawing the perfect line.", content: "<b>Context:</b> Best fit line minimizes distance to points.<br><b>Example:</b> Trend line.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snake adjusting its body to pass through the middle of scattered dots." },
+                                { region: "EU", title: "Formula", hook: "y = mx + c.", content: "<b>Context:</b> The math of lines.<br><b>Example:</b> Slope and Intercept.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Slope and Intercept illustrated by Snake sliding down a ramp." },
+                                { region: "AMER", title: "First Model", hook: "My first prediction.", content: "<b>Context:</b> Personal story of the first regression model.<br><b>Example:</b> Predicting exam scores.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Baby Snake predicting the next number in a sequence correctly." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 11",
+                        theme: "Classification Systems",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Logistic Reg", hook: "It's not for regression.", content: "<b>Context:</b> Classifying Yes/No using Sigmoid function.<br><b>Example:</b> Spam vs Not Spam.<br><b>Project Ref:</b> `Credit Card EDA Showcase` (Fraud Classification).<br><b>Animated Visual:</b> Snake sliding down an S-curve slide into 'Yes' or 'No' bins." },
+                                { region: "EU", title: "Confusion Matrix", hook: "Type 1 vs Type 2 Errors.", content: "<b>Context:</b> False Positives vs False Negatives.<br><b>Example:</b> Predicting fire when there is none.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake sorting apples and accidentally putting a rock in the apple bin (Error)." },
+                                { region: "AMER", title: "Spam Filter", hook: "How Gmail works.", content: "<b>Context:</b> Naive Bayes Classification.<br><b>Example:</b> Probability of 'Prince' appearing in spam.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake guarding a mailbox and throwing junk mail into the trash." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "SVM", hook: "Hyperplanes and Kernels.", content: "<b>Context:</b> Separating data with the widest gap.<br><b>Example:</b> Drawing a line between Red and Blue teams.<br><b>Project Ref:</b> `CineMatch Engine` (Classification logic).<br><b>Animated Visual:</b> Snake drawing a wide road between red and blue dots to keep them apart." },
+                                { region: "EU", title: "Decision Trees", hook: "If This Then That.", content: "<b>Context:</b> Tree-based logic splitting data.<br><b>Example:</b> Is it raining? Yes -> Umbrella.<br><b>Project Ref:</b> `Green Taxi Estimator` (Random Forest Base).<br><b>Animated Visual:</b> Snake climbing a tree and choosing branches based on yes/no signs." },
+                                { region: "AMER", title: "F1 Score", hook: "Why Accuracy lies.", content: "<b>Context:</b> Harmonic mean of Precision and Recall.<br><b>Example:</b> Imbalanced datasets.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake balancing on a seesaw labeled Precision and Recall." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Sort", hook: "Red balls vs Blue balls.", content: "<b>Context:</b> Visualizing classification boundaries.<br><b>Example:</b> Separating clusters.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snake drawing a circle around blue balls to separate them from red ones." },
+                                { region: "EU", title: "KNN", hook: "Who are your neighbors?", content: "<b>Context:</b> K-Nearest Neighbors. Distance-based classification.<br><b>Example:</b> Voting by proximity.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake looking at the color of the 5 nearest snakes to decide its own color." },
+                                { region: "AMER", title: "Fraud", hook: "Catching the 1%.", content: "<b>Context:</b> Anomaly detection in finance.<br><b>Example:</b> Credit card fraud.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake spotting a fake coin among real ones and alerting." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 12",
+                        theme: "Ensemble Methods",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Random Forest", hook: "A forest is smarter than a tree.", content: "<b>Context:</b> Bagging logic. Averaging many decision trees.<br><b>Example:</b> Crowd wisdom.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Many small snakes voting on a direction, and the majority wins." },
+                                { region: "EU", title: "Boosting", hook: "Learning from mistakes.", content: "<b>Context:</b> XGBoost/AdaBoost. Sequential learning.<br><b>Example:</b> Correcting hard-to-predict errors.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake trying a puzzle, failing, and the next snake fixing the mistake." },
+                                { region: "AMER", title: "Kaggle", hook: "Why XGBoost wins.", content: "<b>Context:</b> Gradient Boosting dominance in competitions.<br><b>Example:</b> Speed and accuracy.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> A turbo-charged Snake racing past others with a rocket boost." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Voting", hook: "Democracy in AI.", content: "<b>Context:</b> Hard vs Soft Voting.<br><b>Example:</b> Majority rule vs Probability average.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snakes raising signs to vote for a decision." },
+                                { region: "EU", title: "Stacking", hook: "Models learning from models.", content: "<b>Context:</b> Meta-learning. Using predictions as features.<br><b>Example:</b> A manager model overseeing worker models.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snakes standing on each other's shoulders to reach high fruit." },
+                                { region: "AMER", title: "Deployment", hook: "Notebook to API.", content: "<b>Context:</b> Putting models in production.<br><b>Example:</b> Streamlit or Flask.<br><b>Project Ref:</b> `Green Taxi Estimator` (Streamlit App).<br><b>Animated Visual:</b> Packaging a trained Snake into a shipping box and mailing it." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Team", hook: "Teamwork makes the dream work.", content: "<b>Context:</b> Ensemble intuition.<br><b>Example:</b> Many weak learners make a strong one.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> A group of Snakes carrying a heavy log together that one couldn't lift." },
+                                { region: "EU", title: "Tuning", hook: "Grid Search.", content: "<b>Context:</b> Finding the best hyperparameters.<br><b>Example:</b> Adjusting settings.<br><b>Project Ref:</b> `Green Taxi Estimator`.<br><b>Animated Visual:</b> Snake turning knobs on a radio to find the clearest signal." },
+                                { region: "AMER", title: "Simplicity", hook: "Start simple.", content: "<b>Context:</b> Occam's Razor. Don't overcomplicate.<br><b>Example:</b> Logistic Regression first.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction`.<br><b>Animated Visual:</b> Snake choosing a straight path over a complicated maze." }
+                            ]}
+                        ]
+                    }
+                ]
+            },
+            {
+                month: "Month 4",
+                title: "Unsupervised & Deep Learning",
+                desc: "Focus: Clustering, Computer Vision, and Neural Networks.",
+                weeks: [
+                    {
+                        week: "Week 13",
+                        theme: "Unsupervised Learning",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "K-Means", hook: "Grouping without labels.", content: "<b>Context:</b> Finding centroids iteratively.<br><b>Example:</b> Grouping T-Shirt sizes.<br><b>Project Ref:</b> `CineMatch Engine` (Clustering).<br><b>Animated Visual:</b> Snake moving flag poles (centroids) until groups of dots are balanced." },
+                                { region: "EU", title: "Hierarchical", hook: "Trees of clusters.", content: "<b>Context:</b> Dendrograms show relationships.<br><b>Example:</b> Family tree of data.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake connecting items into pairs, then pairs into groups, building a tree." },
+                                { region: "AMER", title: "Marketing", hook: "Customer Segmentation.", content: "<b>Context:</b> Grouping users by behavior.<br><b>Example:</b> High spenders vs Bargain hunters.<br><b>Project Ref:</b> `Madhav Ecommerce Dashboard`.<br><b>Animated Visual:</b> Snake organizing shoppers into 'Spenders', 'Savers', and 'Browsers' queues." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "DBSCAN", hook: "Clustering by density.", content: "<b>Context:</b> Handling noise and weird shapes.<br><b>Example:</b> Geographic data.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Snake finding dense patches of grass and ignoring isolated tufts." },
+                                { region: "EU", title: "Metrics", hook: "Silhouette Score.", content: "<b>Context:</b> Is the cluster good?<br><b>Example:</b> Measuring separation distance.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake measuring how close items are to their friends vs enemies." },
+                                { region: "AMER", title: "Anomaly", hook: "Finding hackers.", content: "<b>Context:</b> Outlier detection via clustering.<br><b>Example:</b> Network security.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake finding a black sheep in a white flock and blowing a whistle." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Groups", hook: "Sorting candy.", content: "<b>Context:</b> Intuition of clustering.<br><b>Example:</b> Putting Skittles in piles.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake encircling piles of same-colored candy." },
+                                { region: "EU", title: "Labeling", hook: "No labels? No problem.", content: "<b>Context:</b> Unsupervised learning.<br><b>Example:</b> Discovering topics in news.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake putting blank tags on mystery boxes." },
+                                { region: "AMER", title: "Discovery", hook: "Finding patterns.", content: "<b>Context:</b> Generating insights.<br><b>Example:</b> Market basket analysis.<br><b>Project Ref:</b> `Credit Card EDA Showcase`.<br><b>Animated Visual:</b> Snake uncovering a hidden treasure map." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 14",
+                        theme: "Computer Vision Basics",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "OpenCV", hook: "Images are just numbers.", content: "<b>Context:</b> Pixel matrices (RGB).<br><b>Example:</b> 0 is black, 255 is white.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake looking at a photo and seeing a matrix grid of numbers." },
+                                { region: "EU", title: "Color Spaces", hook: "RGB vs HSV.", content: "<b>Context:</b> How computers see color vs humans.<br><b>Example:</b> Filtering for 'Red' objects.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake wearing different glasses to see colors differently." },
+                                { region: "AMER", title: "Filters", hook: "Blurring and Edges.", content: "<b>Context:</b> Convolution kernels.<br><b>Example:</b> Gaussian Blur.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake rubbing a picture to blur it." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Morphology", hook: "Cleaning binary images.", content: "<b>Context:</b> Erosion and Dilation.<br><b>Example:</b> Removing noise dots.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake eroding jagged edges of a shape to make it smooth." },
+                                { region: "EU", title: "Thresholding", hook: "Separating object from background.", content: "<b>Context:</b> Binarization (Black/White).<br><b>Example:</b> Scanning a document.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake turning a grey image into strictly Black and White." },
+                                { region: "AMER", title: "Face Detect", hook: "Finding faces.", content: "<b>Context:</b> Haar Cascades.<br><b>Example:</b> Camera autofocus.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake drawing green boxes around people's faces instantly." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Pixels", hook: "Zooming in.", content: "<b>Context:</b> Image structure.<br><b>Example:</b> Resolution.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Zooming into a cat's eye to show the individual square pixels." },
+                                { region: "EU", title: "Preprocessing", hook: "Preparing for OCR.", content: "<b>Context:</b> Cleaning text images.<br><b>Example:</b> Deskewing.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake straightening a scanned document." },
+                                { region: "AMER", title: "Surveillance", hook: "The all-seeing eye.", content: "<b>Context:</b> Motion detection.<br><b>Example:</b> Security cameras.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake alerting when something moves in the frame." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 15",
+                        theme: "Neural Networks (ANN)",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Perceptron", hook: "The single neuron.", content: "<b>Context:</b> Weights, bias, and activation.<br><b>Example:</b> Mimicking a brain cell.<br><b>Project Ref:</b> `NLP Suite: Voice` (Basic NN logic).<br><b>Animated Visual:</b> Snake weighing inputs on a scale to decide 'Yes' or 'No'." },
+                                { region: "EU", title: "Backprop", hook: "Learning from mistakes.", content: "<b>Context:</b> Gradient descent in NNs.<br><b>Example:</b> Adjusting weights backward.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake retracing its steps to find where it dropped a coin." },
+                                { region: "AMER", title: "Activation", hook: "ReLU vs Sigmoid.", content: "<b>Context:</b> Adding non-linearity.<br><b>Example:</b> Firing threshold.<br><b>Project Ref:</b> `Green Taxi Estimator` (NN Model).<br><b>Animated Visual:</b> A gate opening (ReLU) only for positive numbers." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Optimizers", hook: "Adam is all you need.", content: "<b>Context:</b> Adaptive learning rates.<br><b>Example:</b> Reaching the minimum faster.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake hiking down a hill, adjusting speed based on steepness." },
+                                { region: "EU", title: "Loss", hook: "Cross-Entropy.", content: "<b>Context:</b> Measuring error in classification.<br><b>Example:</b> Log loss.<br><b>Project Ref:</b> `Green Taxi Estimator` (Error Metric).<br><b>Animated Visual:</b> Snake looking at a scorecard and frowning at mistakes." },
+                                { region: "AMER", title: "DL History", hook: "Why now?", content: "<b>Context:</b> Compute + Data + Algo.<br><b>Example:</b> GPU evolution.<br><b>Project Ref:</b> `NLP Suite`.<br><b>Animated Visual:</b> A timeline from 1950s Perceptron to 2024 AI." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Brain", hook: "Neurons firing.", content: "<b>Context:</b> Network architecture.<br><b>Example:</b> Layers of nodes.<br><b>Project Ref:</b> `NLP Suite`.<br><b>Animated Visual:</b> A web of lights blinking as information travels through the network." },
+                                { region: "EU", title: "Vanishing", hook: "Why Deep Networks failed.", content: "<b>Context:</b> Vanishing Gradient Problem.<br><b>Example:</b> Signal loss.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> A signal fading out before it reaches the end of the tunnel." },
+                                { region: "AMER", title: "Demystify", hook: "It's just math.", content: "<b>Context:</b> Matrix multiplication.<br><b>Example:</b> No magic, just calculus.<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Snake pulling back a wizard's curtain to reveal a calculator." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 16",
+                        theme: "Convolutional Networks (CNN)",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Convolution", hook: "Filters and Strides.", content: "<b>Context:</b> Feature extraction.<br><b>Example:</b> Detecting edges.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake sliding a stained-glass window (filter) over an image." },
+                                { region: "EU", title: "Pooling", hook: "Shrinking the image.", content: "<b>Context:</b> Max Pooling reduces size but keeps features.<br><b>Example:</b> Summarizing.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake keeping only the biggest number from a grid of 4." },
+                                { region: "AMER", title: "LeNet-5", hook: "The grandfather of CNNs.", content: "<b>Context:</b> Digit recognition history.<br><b>Example:</b> MNIST dataset.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Retro animation of handwritten digit recognition." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Augmentation", hook: "Faking more data.", content: "<b>Context:</b> Rotating/Flipping to increase dataset.<br><b>Example:</b> Robustness.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake looking in a mirror house showing distorted reflections." },
+                                { region: "EU", title: "Transfer", hook: "Standing on giants.", content: "<b>Context:</b> Using pre-trained models (VGG, ResNet).<br><b>Example:</b> Fine-tuning.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Small Snake riding on top of a Giant Snake to reach higher." },
+                                { region: "AMER", title: "Self-Driving", hook: "How cars see.", content: "<b>Context:</b> Lane detection.<br><b>Example:</b> Tesla vision.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Snake driving a car and staying perfectly in lanes." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Scan", hook: "Scanning filters.", content: "<b>Context:</b> How CNNs see edges.<br><b>Example:</b> Vertical vs Horizontal.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Filter highlighting horizontal lines then vertical lines on a building." },
+                                { region: "EU", title: "Architecture", hook: "Flattening.", content: "<b>Context:</b> Connecting CNN to Dense layers.<br><b>Example:</b> Transition.<br><b>Project Ref:</b> `Nirkhan Surveillance`.<br><b>Animated Visual:</b> Snake rolling a 2D rug into a 1D tube." },
+                                { region: "AMER", title: "Medical", hook: "AI Doctors.", content: "<b>Context:</b> X-Ray analysis.<br><b>Example:</b> Detecting pneumonia.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Adaptive Vision).<br><b>Animated Visual:</b> Snake looking at an X-Ray bone and pointing at a crack." }
+                            ]}
+                        ]
+                    }
+                ]
+            },
+            {
+                month: "Month 5",
+                title: "Advanced Deep Learning & NLP",
+                desc: "Focus: RNNs, NLP Basics, Word Embeddings, and Transformers.",
+                weeks: [
+                    {
+                        week: "Week 17",
+                        theme: "Recurrent Neural Networks",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "RNN Logic", hook: "Networks with memory.", content: "<b>Context:</b> Processing sequences.<br><b>Example:</b> Time series.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake carrying a backpack with items collected from previous steps." },
+                                { region: "EU", title: "Sequences", hook: "Time series data.", content: "<b>Context:</b> Data that flows over time.<br><b>Example:</b> Stock prices.<br><b>Project Ref:</b> `NLP Suite: Voice`.<br><b>Animated Visual:</b> Snake watching a river flow and noting the water level." },
+                                { region: "AMER", title: "Stocks", hook: "Predicting the future.", content: "<b>Context:</b> Financial forecasting.<br><b>Example:</b> Price trends.<br><b>Project Ref:</b> `AgriCast360` (Forecasting).<br><b>Animated Visual:</b> Snake looking at a crystal ball showing a stock chart line." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "LSTM", hook: "Fixing memory loss.", content: "<b>Context:</b> Long Short-Term Memory.<br><b>Example:</b> Remembering context.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake putting important notes in a safe and throwing trash notes away." },
+                                { region: "EU", title: "GRU", hook: "Faster LSTMs.", content: "<b>Context:</b> Gated Recurrent Units.<br><b>Example:</b> Efficiency.<br><b>Project Ref:</b> `NLP Suite: Voice`.<br><b>Animated Visual:</b> A streamlined, faster version of the LSTM Snake running." },
+                                { region: "AMER", title: "Voice", hook: "Siri hearing you.", content: "<b>Context:</b> Speech to Text.<br><b>Example:</b> Audio processing.<br><b>Project Ref:</b> `NLP Suite: Voice`.<br><b>Animated Visual:</b> Sound waves turning into text bubbles as the Snake speaks." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Memory", hook: "Remembering context.", content: "<b>Context:</b> Hidden states.<br><b>Example:</b> Predicting the next word.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake highlighting words in a sentence based on what it read before." },
+                                { region: "EU", title: "BPTT", hook: "Training is hard.", content: "<b>Context:</b> Backprop Through Time.<br><b>Example:</b> Gradient issues.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake running backwards through a long tunnel." },
+                                { region: "AMER", title: "Evolution", hook: "RNN to Transformer.", content: "<b>Context:</b> History of NLP.<br><b>Example:</b> Attention mechanism.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Evolution chart from cell to dinosaur to bird (Transformer)." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 18",
+                        theme: "NLP Foundations",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Tokenization", hook: "Chopping words.", content: "<b>Context:</b> Breaking text into pieces.<br><b>Example:</b> 'Hello World' -> ['Hello', 'World'].<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake slicing a baguette (sentence) into slices (tokens)." },
+                                { region: "EU", title: "Stemming", hook: "Running -> Run.", content: "<b>Context:</b> Root words.<br><b>Example:</b> Normalization.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake pruning a plant to leave only the main stem." },
+                                { region: "AMER", title: "Chatbots", hook: "Hello World.", content: "<b>Context:</b> Basic conversational AI.<br><b>Example:</b> Customer support.<br><b>Project Ref:</b> `NLP Suite: Text` (Generative).<br><b>Animated Visual:</b> Snake talking to a robot snake with speech bubbles." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Bag of Words", hook: "Counting words.", content: "<b>Context:</b> Simple vectorization.<br><b>Example:</b> Frequency count.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake counting how many times 'Apple' appears in a basket." },
+                                { region: "EU", title: "TF-IDF", hook: "Finding rare words.", content: "<b>Context:</b> Term Frequency - Inverse Document Frequency.<br><b>Example:</b> Importance weighting.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake weighing words on a scale; rare words are heavy gold." },
+                                { region: "AMER", title: "Sentiment", hook: "Angry or Happy?", content: "<b>Context:</b> Classification.<br><b>Example:</b> Tweet analysis.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake reading a tweet and holding up a Smiley or Frown face." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Text", hook: "Reading.", content: "<b>Context:</b> Text processing.<br><b>Example:</b> Cleaning.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Books flying into a funnel and coming out as binary code." },
+                                { region: "EU", title: "Stop Words", hook: "Deleting 'The'.", content: "<b>Context:</b> Noise removal.<br><b>Example:</b> 'is', 'the', 'at'.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake vacuuming up common words like 'is', 'the', 'at'." },
+                                { region: "AMER", title: "Slang", hook: "Language is hard.", content: "<b>Context:</b> Ambiguity.<br><b>Example:</b> Sarcasm.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake looking confused at the phrase 'It's raining cats and dogs'." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 19",
+                        theme: "Embeddings & Vectors",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Word2Vec", hook: "King - Man + Woman = Queen.", content: "<b>Context:</b> Vector math relationships.<br><b>Example:</b> Semantic meaning.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake doing math equations with pictures instead of numbers." },
+                                { region: "EU", title: "CBOW", hook: "Fill in the blank.", content: "<b>Context:</b> Predicting context.<br><b>Example:</b> The cat sat on the __.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake guessing the missing piece of a puzzle correctly." },
+                                { region: "AMER", title: "Vector Search", hook: "Meaning search.", content: "<b>Context:</b> Semantic search.<br><b>Example:</b> Finding similar concepts.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake searching a library for 'Scary' and finding 'Horror' books." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "N-Grams", hook: "Predicting next word.", content: "<b>Context:</b> Probability sequence.<br><b>Example:</b> Autocomplete.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake guessing what letter comes next on a Wheel of Fortune board." },
+                                { region: "EU", title: "One-Hot", hook: "Why it fails.", content: "<b>Context:</b> Sparse matrices inefficient.<br><b>Example:</b> High dimensions.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction` (Categorical).<br><b>Animated Visual:</b> A giant mostly empty grid vs a small dense box." },
+                                { region: "AMER", title: "Recommender", hook: "You might like...", content: "<b>Context:</b> Similarity.<br><b>Example:</b> Movie suggestion.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake suggesting a movie based on what you just watched." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Space", hook: "Words in 3D.", content: "<b>Context:</b> Vector space visualization.<br><b>Example:</b> Clusters of meaning.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake flying through a galaxy where stars are words grouped by meaning." },
+                                { region: "EU", title: "Training", hook: "Reading Wikipedia.", content: "<b>Context:</b> Learning weights.<br><b>Example:</b> Large corpus.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake speed-reading a giant stack of encyclopedias." },
+                                { region: "AMER", title: "Google", hook: "How Search works.", content: "<b>Context:</b> Algorithms.<br><b>Example:</b> Ranking.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> Snake fetching a webpage instantly from a sea of data." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 20",
+                        theme: "Transformers & Attention",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Attention", hook: "Attention Is All You Need.", content: "<b>Context:</b> Self-Attention mechanism.<br><b>Example:</b> Focusing on relevant words.<br><b>Project Ref:</b> `NLP Suite: Text` (Transformer).<br><b>Animated Visual:</b> Snake looking at a sentence and drawing glowing lines connecting related words." },
+                                { region: "EU", title: "Architecture", hook: "Encoder-Decoder.", content: "<b>Context:</b> Translation structure.<br><b>Example:</b> English to French.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> One Snake whispering into a box, another listening and writing." },
+                                { region: "AMER", title: "ChatGPT", hook: "How it works.", content: "<b>Context:</b> GPT logic.<br><b>Example:</b> Next token prediction.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake predicting one word at a time to write a poem." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Multi-Head", hook: "Multiple perspectives.", content: "<b>Context:</b> Parallel attention heads.<br><b>Example:</b> Learning different relationships.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Hydra-Snake with multiple heads reading different parts of a page at once." },
+                                { region: "EU", title: "Positional", hook: "Order matters.", content: "<b>Context:</b> Positional encoding.<br><b>Example:</b> Word sequence.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake stamping numbers on words so they know their place in line." },
+                                { region: "AMER", title: "BERT", hook: "Bidirectional.", content: "<b>Context:</b> Understanding context from both sides.<br><b>Example:</b> Fill mask.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake looking left and right simultaneously to understand a word." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Robot", hook: "Transformers transform.", content: "<b>Context:</b> The model architecture.<br><b>Example:</b> NLP breakthrough.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake transforming into a cool robot." },
+                                { region: "EU", title: "Norm", hook: "Normalization.", content: "<b>Context:</b> Layer Norm stability.<br><b>Example:</b> Smooth training.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake balancing perfectly on a tightrope." },
+                                { region: "AMER", title: "Future", hook: "AGI?", content: "<b>Context:</b> Future trends.<br><b>Example:</b> Beyond text.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake looking through a telescope at a futuristic city." }
+                            ]}
+                        ]
+                    }
+                ]
+            },
+            {
+                month: "Month 6",
+                title: "Reinforcement Learning & Career",
+                desc: "Focus: RL Agents, Project Portfolio, and Career Growth.",
+                weeks: [
+                    {
+                        week: "Week 21",
+                        theme: "Reinforcement Learning",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "The Agent", hook: "Training a dog digitally.", content: "<b>Context:</b> Agent, Environment, Reward.<br><b>Example:</b> Teaching a robot.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Autonomous Agent).<br><b>Animated Visual:</b> Snake getting a cookie for moving towards the flag." },
+                                { region: "EU", title: "MDP", hook: "Decision math.", content: "<b>Context:</b> Markov Decision Process.<br><b>Example:</b> States and Actions.<br><b>Project Ref:</b> `AgriCast360` (Decision Logic).<br><b>Animated Visual:</b> Snake standing at a crossroads with probability signs pointing ways." },
+                                { region: "AMER", title: "Games", hook: "Beating Mario.", content: "<b>Context:</b> RL in gaming.<br><b>Example:</b> Superhuman performance.<br><b>Project Ref:</b> `C++ Projects Portal` (Game AI).<br><b>Animated Visual:</b> Snake playing a retro video game console and winning." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Q-Learning", hook: "The cheat sheet.", content: "<b>Context:</b> Q-Table learning.<br><b>Example:</b> Maze solving.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard` (Optimization).<br><b>Animated Visual:</b> Snake consulting a map that fills in as it explores." },
+                                { region: "EU", title: "Exploration", hook: "Explore vs Exploit.", content: "<b>Context:</b> Trying new things vs sticking to what works.<br><b>Example:</b> Restaurant choice.<br><b>Project Ref:</b> `CineMatch Engine` (Discovery).<br><b>Animated Visual:</b> Snake choosing between a known apple and a mystery box." },
+                                { region: "AMER", title: "Robotics", hook: "Sim2Real.", content: "<b>Context:</b> Robots learning in simulation.<br><b>Example:</b> Walking robot.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Hardware).<br><b>Animated Visual:</b> Robot Snake learning to walk without falling over." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Play", hook: "Self-play.", content: "<b>Context:</b> Learning by doing.<br><b>Example:</b> AlphaZero.<br><b>Project Ref:</b> `C++ Projects Portal`.<br><b>Animated Visual:</b> Snake crashing into a wall, saying 'Ouch', and trying a different path." },
+                                { region: "EU", title: "Bellman", hook: "The equation.", content: "<b>Context:</b> Value function.<br><b>Example:</b> Long term reward.<br><b>Project Ref:</b> `AgriCast360` (Forecasting).<br><b>Animated Visual:</b> Snake calculating the value of future gold coins vs current ones." },
+                                { region: "AMER", title: "AlphaGo", hook: "AI vs Human.", content: "<b>Context:</b> DeepMind victory.<br><b>Example:</b> Go board game.<br><b>Project Ref:</b> `C++ Projects Portal`.<br><b>Animated Visual:</b> Snake playing Go against a human master." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 22",
+                        theme: "Full Stack Data Science",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Deployment", hook: "It works on my machine.", content: "<b>Context:</b> Docker containers solve dependency hell.<br><b>Example:</b> Shipping code.<br><b>Project Ref:</b> `Green Taxi Estimator` (Streamlit).<br><b>Animated Visual:</b> Snake packing its house into a shipping container." },
+                                { region: "EU", title: "Pipelines", hook: "CI/CD.", content: "<b>Context:</b> Automation pipelines.<br><b>Example:</b> GitHub Actions.<br><b>Project Ref:</b> `Green Taxi Estimator` (CI/CD).<br><b>Animated Visual:</b> A conveyor belt moving code from laptop to cloud automatically." },
+                                { region: "AMER", title: "Value", hook: "ROI.", content: "<b>Context:</b> Business impact is key.<br><b>Example:</b> Cost saving.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Snake pointing at a chart with rising profits." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Cloud", hook: "AWS/GCP.", content: "<b>Context:</b> Cloud computing basics.<br><b>Example:</b> EC2 instance.<br><b>Project Ref:</b> `NLP Suite` (Cloud API).<br><b>Animated Visual:</b> Snake relaxing on a fluffy cloud with a laptop." },
+                                { region: "EU", title: "Monitoring", hook: "Model drift.", content: "<b>Context:</b> MLOps monitoring.<br><b>Example:</b> Accuracy drop.<br><b>Project Ref:</b> `Live Urban Traffic Dashboard`.<br><b>Animated Visual:</b> Snake watching a gauge and pulling a lever when it goes red." },
+                                { region: "AMER", title: "Scale", hook: "1 Million users.", content: "<b>Context:</b> Scalability.<br><b>Example:</b> Load balancing.<br><b>Project Ref:</b> `CineMatch Engine`.<br><b>Animated Visual:</b> One Snake turning into a thousand Snakes to handle the workload." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Grad", hook: "Graduation.", content: "<b>Context:</b> Completing the roadmap.<br><b>Example:</b> Success.<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Snake throwing a graduation cap in the air." },
+                                { region: "EU", title: "Stack", hook: "Full Stack.", content: "<b>Context:</b> FE + BE + AI.<br><b>Example:</b> Complete app.<br><b>Project Ref:</b> `Web Scraper Showcase` (GUI).<br><b>Animated Visual:</b> Snake wearing three hats stacked on top of each other." },
+                                { region: "AMER", title: "Unicorn", hook: "The Unicorn skill.", content: "<b>Context:</b> High demand skillset.<br><b>Example:</b> Rare find.<br><b>Project Ref:</b> `AgriCast360`.<br><b>Animated Visual:</b> Snake wearing a unicorn horn." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 23",
+                        theme: "Career & Soft Skills",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "Portfolio", hook: "Show, don't tell.", content: "<b>Context:</b> Projects matter more than degrees.<br><b>Example:</b> GitHub profile.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio`.<br><b>Animated Visual:</b> Snake presenting a gallery of its paintings (projects)." },
+                                { region: "EU", title: "Resume", hook: "Beating ATS.", content: "<b>Context:</b> Keyword optimization.<br><b>Example:</b> Resume parsing.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio` (Resume).<br><b>Animated Visual:</b> Snake sliding its resume through a scanner successfully." },
+                                { region: "AMER", title: "Network", hook: "LinkedIn tips.", content: "<b>Context:</b> Connections help.<br><b>Example:</b> DM strategy.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio` (LinkedIn).<br><b>Animated Visual:</b> Snake connecting nodes in a network to form a web." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Interviews", hook: "LeetCode grind.", content: "<b>Context:</b> Technical prep.<br><b>Example:</b> Algorithms.<br><b>Project Ref:</b> `DS Exam Portal`.<br><b>Animated Visual:</b> Snake solving a puzzle on a whiteboard." },
+                                { region: "EU", title: "Comm", hook: "Explain to 5yo.", content: "<b>Context:</b> Soft skills communication.<br><b>Example:</b> ELI5.<br><b>Project Ref:</b> `AgriCast360` (Storytelling).<br><b>Animated Visual:</b> Snake explaining a chart to a baby bird." },
+                                { region: "AMER", title: "Salary", hook: "Negotiation.", content: "<b>Context:</b> Know your value.<br><b>Example:</b> Offer stage.<br><b>Project Ref:</b> `NYC Taxi Fare Prediction` (Value).<br><b>Animated Visual:</b> Snake sitting at a negotiation table shaking hands." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Work", hook: "Office life.", content: "<b>Context:</b> Day in the life.<br><b>Example:</b> Daily standup.<br><b>Project Ref:</b> `Web Scraper Showcase` (Automation).<br><b>Animated Visual:</b> Snake typing at a desk and drinking coffee." },
+                                { region: "EU", title: "Mentor", hook: "Find a guide.", content: "<b>Context:</b> Growth via mentorship.<br><b>Example:</b> Senior dev.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio` (Creator).<br><b>Animated Visual:</b> A big wise Snake guiding a small Snake." },
+                                { region: "AMER", title: "Lead", hook: "Leadership.", content: "<b>Context:</b> Managing teams.<br><b>Example:</b> Empathy.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio` (Experience).<br><b>Animated Visual:</b> Snake leading a line of other creatures." }
+                            ]}
+                        ]
+                    },
+                    {
+                        week: "Week 24",
+                        theme: "The Future & Recap",
+                        days: [
+                            { day: "Tuesday", posts: [
+                                { region: "APAC", title: "GenAI", hook: "The new wave.", content: "<b>Context:</b> LLMs and Generative AI.<br><b>Example:</b> ChatGPT.<br><b>Project Ref:</b> `NLP Suite: Text`.<br><b>Animated Visual:</b> Snake painting a masterpiece with a robot arm." },
+                                { region: "EU", title: "Ethics", hook: "Responsible AI.", content: "<b>Context:</b> Bias and Fairness.<br><b>Example:</b> Ethical AI.<br><b>Project Ref:</b> `Nirkhan Surveillance` (Ethics).<br><b>Animated Visual:</b> Snake weighing 'Good' vs 'Bad' on scales." },
+                                { region: "AMER", title: "Prediction", hook: "Next 5 years.", content: "<b>Context:</b> Future trends.<br><b>Example:</b> AGI.<br><b>Project Ref:</b> `AgriCast360` (Trends).<br><b>Animated Visual:</b> Snake looking through a telescope at a futuristic city." }
+                            ]},
+                            { day: "Wednesday", posts: [
+                                { region: "APAC", title: "Learning", hook: "Never stop.", content: "<b>Context:</b> Continuous improvement.<br><b>Example:</b> Reading papers.<br><b>Project Ref:</b> `DS Exam Portal` (Learning).<br><b>Animated Visual:</b> Snake reading a book while walking on a treadmill." },
+                                { region: "EU", title: "Community", hook: "Give back.", content: "<b>Context:</b> Open Source.<br><b>Example:</b> Contributing.<br><b>Project Ref:</b> `C++ Projects Portal` (Community).<br><b>Animated Visual:</b> Snake watering a community garden." },
+                                { region: "AMER", title: "Thanks", hook: "6 Month Journey.", content: "<b>Context:</b> Gratitude.<br><b>Example:</b> Closing.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio`.<br><b>Animated Visual:</b> Snake bowing to an audience of stars." }
+                            ]},
+                            { day: "Thursday", posts: [
+                                { region: "APAC", title: "Visual Fly", hook: "Blast off.", content: "<b>Context:</b> The end of the beginning.<br><b>Example:</b> Launch.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio`.<br><b>Animated Visual:</b> Snake putting on a jetpack and flying into space." },
+                                { region: "EU", title: "Recap", hook: "Summary.", content: "<b>Context:</b> Link to all resources.<br><b>Example:</b> Master list.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio`.<br><b>Animated Visual:</b> A fast rewind of all previous animations." },
+                                { region: "AMER", title: "Season 2", hook: "What's next?", content: "<b>Context:</b> Teaser.<br><b>Example:</b> Stay tuned.<br><b>Project Ref:</b> `Rudresh Chovatiya - Portfolio`.<br><b>Animated Visual:</b> Snake winking and a 'To Be Continued' sign." }
+                            ]}
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let currentMonthIndex = 0;
+
+        function init() {
+            renderTabs();
+            renderContent(0);
+            calculateStats();
+            lucide.createIcons();
+        }
+
+        function calculateStats() {
+            // Mock stat calculation
+            const pct = 100; // Plan is complete
+            document.getElementById('progressBar').style.width = `${pct}%`;
+            document.getElementById('progressText').textContent = `${pct}%`;
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('monthTabs');
+            tabsContainer.innerHTML = '';
+            contentPlan.forEach((month, index) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex justify-between items-center group ${index === currentMonthIndex ? 'tab-active' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
+                btn.onclick = () => {
+                    currentMonthIndex = index;
+                    renderTabs();
+                    renderContent(index);
+                };
+                btn.innerHTML = `
+                    <span class="font-mono">M${index + 1}</span>
+                    <span class="truncate ml-2 flex-1">${month.title}</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity ${index === currentMonthIndex ? 'hidden' : ''}"></i>
+                `;
+                tabsContainer.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function renderContent(monthIndex) {
+            const monthData = contentPlan[monthIndex];
+            document.getElementById('currentMonthTitle').textContent = monthData.title;
+            document.getElementById('currentMonthDesc').textContent = monthData.desc;
+
+            const grid = document.getElementById('contentGrid');
+            grid.innerHTML = '';
+
+            monthData.weeks.forEach((week, wIndex) => {
+                const weekEl = document.createElement('div');
+                weekEl.className = 'glass-panel rounded-2xl p-6 animate-fade-in';
+                weekEl.style.animationDelay = `${wIndex * 100}ms`;
+
+                let daysHtml = '';
+                week.days.forEach(day => {
+                    let postsHtml = '';
+                    day.posts.forEach((post, pIndex) => {
+                        const uniqueId = `m${monthIndex}-w${wIndex}-${day.day}-${pIndex}`;
+                        const regionClass = post.region === 'APAC' ? 'card-gradient-apac' : post.region === 'EU' ? 'card-gradient-eu' : 'card-gradient-amer';
+                        const icon = post.region === 'APAC' ? 'sun' : post.region === 'EU' ? 'clock' : 'moon';
+                        const toneColor = post.tone === 'Innovation' ? 'text-orange-400' : post.tone === 'Structure' ? 'text-blue-400' : 'text-green-400';
+                        
+                        postsHtml += `
+                            <div class="rounded-xl p-4 border border-slate-700/50 ${regionClass} relative group hover:-translate-y-1 transition-transform duration-300 flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-bold bg-slate-900/50 px-2 py-1 rounded text-slate-300 flex items-center gap-1 border border-slate-700">
+                                            <i data-lucide="${icon}" class="w-3 h-3"></i> ${post.region}
+                                        </span>
+                                        <span class="text-[10px] font-bold bg-slate-900/50 px-2 py-1 rounded ${toneColor} border border-slate-700">
+                                            ${post.tone || 'General'}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                         <span class="text-[10px] text-slate-500 font-mono">${post.time || ''}</span>
+                                        <input type="checkbox" id="${uniqueId}" class="status-checkbox w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-offset-slate-900 cursor-pointer">
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-white text-sm mb-2 leading-tight">${post.title}</h4>
+                                <p class="text-xs text-slate-400 mb-3 italic font-serif">"${post.hook}"</p>
+                                
+                                <div class="bg-slate-900/50 p-3 rounded text-xs text-slate-300 mb-3 border border-slate-800 content-block flex-grow overflow-y-auto custom-scroll max-h-40">
+                                    ${post.content}
+                                </div>
+                                
+                                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-700/50">
+                                    <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">LinkedIn Post</span>
+                                    <button class="text-slate-400 hover:text-white transition-colors" onclick="copyPost('${uniqueId}')" title="Copy Content">
+                                        <i data-lucide="copy" class="w-3 h-3"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    daysHtml += `
+                        <div class="mb-6 last:mb-0">
+                            <div class="flex items-center gap-3 mb-3">
+                                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide w-24">${day.day}</h3>
+                                <div class="h-px bg-slate-700 flex-1"></div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                ${postsHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                weekEl.innerHTML = `
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-2 h-8 bg-blue-500 rounded-full"></div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">${week.week}</h3>
+                            <p class="text-sm text-blue-400">${week.theme}</p>
+                        </div>
+                    </div>
+                    <div>${daysHtml}</div>
+                `;
+                grid.appendChild(weekEl);
+            });
+            lucide.createIcons();
+        }
+
+        function expandAll() { /* ... */ }
+        function collapseAll() { /* ... */ }
+
+        init();
+    </script>
+</body>
+</html>
